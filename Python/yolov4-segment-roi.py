@@ -20,11 +20,11 @@ img_height = 416
 
 
 def drawbbx(img, x, y, w, h, predName, score):
-    colorline = (0, 255, 0)  # 角点线段颜色
-    angerline = 13  # 角点线段长度
-    # 检测框
+    colorline = (0, 255, 0)  # angerline colour
+    angerline = 13  # angerline length
+    # Draw Detection Boxes
     cv2.rectangle(img, (x, y), (x + w, y + h), (255, 255, 0), 1)
-    # 角点美化
+    # angerline beautify
     cv2.line(img, (x, y), (x + angerline, y), colorline, 2)
     cv2.line(img, (x, y), (x, y + angerline), colorline, 2)
     cv2.line(img, (x + w, y), (x + w, y + angerline), colorline, 2)
@@ -34,10 +34,10 @@ def drawbbx(img, x, y, w, h, predName, score):
     cv2.line(img, (x + w, y + h), (x + w, y + h - angerline), colorline, 2)
     cv2.line(img, (x + w, y + h), (x + w - angerline, y + h), colorline, 2)
 
-    # 显示预测的类别
+    # Show predict category 显示预测的类别
     cv2.putText(img, predName, (x, y + h + 20), cv2.FONT_HERSHEY_COMPLEX, 1, (0, 255, 0), 2)
 
-    # 显示预测概率
+    # Show Predict percentage 显示预测概率
     cv2.putText(img, str(int(score * 100)) + '%', (x, y - 5), cv2.FONT_HERSHEY_COMPLEX, 1, (0, 255, 255), 2)
 
 
@@ -66,7 +66,7 @@ class MainWindow(QMainWindow):
         self.ui.GetObjSegmentBtn.clicked.connect(self.segment)
         self.ui.SelcPathBtn.clicked.connect(self.chooseDir)
         self.ui.SelcPathBtn_segment.clicked.connect(self.chooseSegmentDir)
-        self.ui.AboutBtn.clicked.connect(self.say_hello)  # 多文件的情况在这里就可以进行函数链接
+        self.ui.AboutBtn.clicked.connect(self.say_hello)
 
     def setup_camera(self, fps):
         self.camera_capture.set(3, self.video_size.width())
@@ -87,14 +87,16 @@ class MainWindow(QMainWindow):
         classids, scores, bboxes = model.detect(frame, 0.8, 0.3)
         for class_id, score, bbox in zip(classids, scores, bboxes):
             # 获取检测框的左上角坐标和宽高
+            # Get the coordinates of the top left corner of the detection box and the width and height
             x, y, w, h = bbox
 
             # 获取检测框对应的分类名
+            # Get the name of the category corresponding to the detection box
             class_name = classes[class_id]
 
             drawbbx(frame, x, y, w, h, class_name, score)
 
-        T2 = time.perf_counter()  # 检测完毕时间节点
+        T2 = time.perf_counter()  # Detection Complete Time 检测完毕时间节点
         cv2.putText(frame, str("RT: ") + str(int((T2 - T1) * 1000)) + str('ms'), (10, 50), cv2.FONT_HERSHEY_COMPLEX, 1,
                     (0, 0, 255), 2)
         cv2.putText(frame, str("FPS: 30"), (10, 100), cv2.FONT_HERSHEY_COMPLEX, 1, (0, 0, 255), 2)
@@ -129,10 +131,9 @@ class MainWindow(QMainWindow):
             segment_index = 1
             classids, scores, bboxes = model.detect(frame, 0.8, 0.3)
             for class_id, score, bbox in zip(classids, scores, bboxes):
-                # 获取检测框的左上角坐标和宽高
+                
                 x, y, w, h = bbox
 
-                # 获取检测框对应的分类名
                 class_name = classes[class_id]
 
                 drawbbx(frame, x, y, w, h, class_name, score)
@@ -154,10 +155,9 @@ class MainWindow(QMainWindow):
 
             classids, scores, bboxes = model.detect(frame, 0.8, 0.3)
             for class_id, score, bbox in zip(classids, scores, bboxes):
-                # 获取检测框的左上角坐标和宽高
+
                 x, y, w, h = bbox
 
-                # 获取检测框对应的分类名
                 class_name = classes[class_id]
 
                 drawbbx(frame, x, y, w, h, class_name, score)
@@ -233,10 +233,8 @@ class fromFilePage(QDialog):
 
             classids, scores, bboxes = model.detect(frame, 0.8, 0.3)
             for class_id, score, bbox in zip(classids, scores, bboxes):
-                # 获取检测框的左上角坐标和宽高
                 x, y, w, h = bbox
 
-                # 获取检测框对应的分类名
                 class_name = classes[class_id]
 
                 drawbbx(frame, x, y, w, h, class_name, score)
@@ -258,10 +256,8 @@ class fromFilePage(QDialog):
             segment_index = 1
             classids, scores, bboxes = model.detect(frame, 0.8, 0.3)
             for class_id, score, bbox in zip(classids, scores, bboxes):
-                # 获取检测框的左上角坐标和宽高
                 x, y, w, h = bbox
 
-                # 获取检测框对应的分类名
                 class_name = classes[class_id]
 
                 drawbbx(frame, x, y, w, h, class_name, score)
@@ -281,19 +277,20 @@ class fromFilePage(QDialog):
 if __name__ == '__main__':
     app = QtWidgets.QApplication(sys.argv)
     net = cv2.dnn.readNet('yolo-tiny-random\\remote_tiny.cfg',
-                          'yolo-tiny-random\\weights\\remote_tiny_final.weights')  # for DIY YOLO Tiny
+                          'yolo-tiny-random\\weights\\remote_tiny_final.weights')  # for Self-trained YOLO Tiny
     # 定义一个目标检测模型，将模型传进去
+    # Define a object detection model and pass in the net config
     model = cv2.dnn_DetectionModel(net)
     model.setInputParams(size=(416, 416), scale=1 / 255)
 
     # （2）获取分类文本的信息
-    classes = []  # 存放每个分类的名称
+    #  (2) Get lines(category names) on .names file
+    classes = []  # list use to save category names
     with open('yolo-tiny\\remote_tiny.names') as file_obj:
-        # 获取文本中的每一行
         for class_name in file_obj.readlines():
-            # 删除文本中的换行符、空格等
+            # Remove line breaks, spaces, etc. from text
             class_name = class_name.strip()
-            # 将每个分类名保存到列表中
+            # append each category name to a list 将每个分类名保存到列表中
             classes.append(class_name)
 
     player = MainWindow()
