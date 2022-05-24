@@ -288,7 +288,7 @@ if __name__ == '__main__':
 
     # （2）获取分类文本的信息
     classes = []  # 存放每个分类的名称
-    with open('yolo-tiny\\remote_tiny.names') as file_obj:
+    with open('yolo-tiny-random\\remote_tiny.names') as file_obj:
         # 获取文本中的每一行
         for class_name in file_obj.readlines():
             # 删除文本中的换行符、空格等
