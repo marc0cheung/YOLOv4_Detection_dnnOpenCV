@@ -12,7 +12,7 @@ YOLO 系列深度学习网络深受各界的欢迎。 [AlexeyAB](https://github.
 
 ### 软件主页面
 
-<img src="https://github.com/marc0cheung/YOLOv4_RemoteDetection_OpenCVDNN/raw/main/Python/README_SimplifiedCN.assets/image-20220523165423786.png" alt="image-20220523165423786" style="zoom: 67%;" />
+<img src="https://github.com/marc0cheung/YOLOv4_RemoteDetection_OpenCVDNN/raw/main/Python/README_SimplifiedCN.assets/image-20220523165423786.png" alt="image-20220523165423786" style="zoom: 50%;" />
 
 <br>
 
@@ -29,13 +29,13 @@ YOLO 系列深度学习网络深受各界的欢迎。 [AlexeyAB](https://github.
 
 ### 图片检测功能页
 
-<img src="https://github.com/marc0cheung/YOLOv4_RemoteDetection_OpenCVDNN/blob/main/Python/README_SimplifiedCN.assets/image-20220523165747321.png?raw=true" alt="image-20220523165747321" style="zoom:67%;" />
+<img src="https://github.com/marc0cheung/YOLOv4_RemoteDetection_OpenCVDNN/blob/main/Python/README_SimplifiedCN.assets/image-20220523165747321.png?raw=true" alt="image-20220523165747321" style="zoom: 50%;" />
 
 <br>
 
 ### 目标分割提取效果
 
-<img src="https://github.com/marc0cheung/YOLOv4_RemoteDetection_OpenCVDNN/blob/main/Python/README_SimplifiedCN.assets/image-20220523165857078.png?raw=true" style="zoom:67%;" />
+<img src="https://github.com/marc0cheung/YOLOv4_RemoteDetection_OpenCVDNN/blob/main/Python/README_SimplifiedCN.assets/image-20220523165857078.png?raw=true" style="zoom: 50%;" />
 
 <br>
 
