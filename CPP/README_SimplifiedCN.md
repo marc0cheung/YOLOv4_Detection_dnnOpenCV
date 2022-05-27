@@ -3,9 +3,10 @@
 OpenCV 中的 dnn 模块用于读取各深度学习技术下的神经网络，并提供了目标检测的实现。在 darknet 主页的介绍中，OpenCV 是 “速度最快的 YOLOv4 目标检测实现”。为了实现 CPU 上的目标检测，选用了 OpenCV 作为基础，利用 C++ 和 Python 分别写了对应的实现。同时，在 C++ 版本的实现中，还提供了 CPU 运算版本与 GPU 运算版本的切换。<br>
 测试中所采用的工控机 CUDA 与 cuDNN 的版本为：<br>
 CUDA: `cuda_10.1.243_426.00_win10.exe`
-<br>
+
 cuDNN: `cudnn-10.1-windows10-x64-v8.0.5.39.zip`
 <br><br>
+
 ## 快速配置环境指南（GPU）
 利用本人编译好的 `OpenCV with CUDA` 动态运行库，进行快速配置。
 注意：该配置方法仅适用于与本人使用同一 CUDA 和 cuDNN 版本的情况。
@@ -45,7 +46,7 @@ cuDNN: `cudnn-10.1-windows10-x64-v8.0.5.39.zip`
  - 前往 [OpenCV Contrib Release Tags](https://github.com/opencv/opencv_contrib/tags) 下载对应版本的 OpenCV Contrib 库源代码。因为 CUDA 加速等比较新的特性，OpenCV 将其放置在 opencv_contrib 库中。将下载到的文件解压，放置到 OpenCV 的 sources 文件夹下。
  - 在 OpenCV 的 build 文件夹下新建一个 `x64_cuda_build` 文件夹，打开 cMake ，选择 source 和 build 对应的存放位置，点击 Configure 按钮，选择 VS2019 和 x64 ，确认。
  - 在 cMake 界面中，按照下列描述，调整各选项：
-  
+
 ```
 启用：WITH_CUDA
 启用：OPENCV_DNN_CUDA
