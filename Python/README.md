@@ -6,7 +6,7 @@
 
 ## Introduction
 
-The YOLO family of deep learning networks has been well received by the community. [AlexeyAB](https://github.com/AlexeyAB/darknet/) uses Darknet to implement YOLOv4, a target detection network with a good balance of speed and recognition rate. The OpenCV support for the DNN module makes it easy to read the neural network weights, architecture and other files, thus eliminating the slow detection rate of Darknet.
+The YOLO family of deep learning networks has been well received by the community. [AlexeyAB](https://github.com/AlexeyAB/darknet/) uses Darknet to implement YOLOv4, a target detection network with a good balance of speed and recognition rate. The OpenCV support for the DNN module makes it easy to read the neural network weights, `.cfg` files and `.names` files, thus eliminating the slow detection rate of Darknet.
 
 This software is a real-time implementation of YOLOv4-Tiny network detection based on OpenCV-Python, PySide2. The training weights used are for a real-time detection model for remote controls, trained using Google Colab.
 
