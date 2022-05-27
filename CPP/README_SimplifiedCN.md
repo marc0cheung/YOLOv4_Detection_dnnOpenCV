@@ -11,6 +11,7 @@ cuDNN: `cudnn-10.1-windows10-x64-v8.0.5.39.zip`
 利用本人编译好的 `OpenCV with CUDA` 动态运行库，进行快速配置。
 注意：该配置方法仅适用于与本人使用同一 CUDA 和 cuDNN 版本的情况。
 <br>
+
 - 下载本人编译好的 `x64_dnn.zip` 压缩包
 - 解压到你的 `opencv\build\` 下。
 - 参考 【从零开始配置环境（GPU）】的 Step 4，在系统环境变量中添加 `D:\opencv\build\x64_dnn\vc16\bin` 
@@ -67,7 +68,7 @@ CUDA_ARCH_BIN：选择自己显卡的算力版本，例如 Pascal 架构显卡�
 
 - 按照上述内容配置完毕后，再次点击 configure 按钮，如果刚开始上述的某些选项没有出现，请点第一次 configure 按钮后再搜索。
 - 对于身处中国的用户，cMake 在编译过程中会自动从 GitHub 上下载一些内容，此时可能由于网络原因无法下载。如果 cMake 在编译过程出现查看 cMakeDownloadLog.txt 的提示，用户应当按照 [这篇文章](https://blog.csdn.net/painice/article/details/123347824) 来解决问题。
-- 当 cMake 没有任何红色错误出现后，查看 cMake 输出信息中，是否在 CUDA 处有对应的版本号，cuDNN 处是否显示 `CUDNN: YES (Ver X.X.X)` ，以及 CUDA_ARCH_XXX 处是否显示显卡的算力版本。
+- 当 cMake 没有任何红色错误出现后，查看 cMake 输出信息中，是否在 CUDA 处有对应的版本号，cuDNN 处是否显示 `CUDNN: YES (Ver X.X.X)` ，以及 CUDA_ARCH_BIN 处是否显示显卡的算力版本。
 - 当 cMake 的一切都没有问题，即可选择 `Open Project` 按钮，用 VS2019 打开项目，选择 `生成` > `批生成` > 勾选 INSTALL 的 Debug 和 Release 版本，选择生成。
 - 经过漫长的等待，我们即可在 `x64_cuda_build` 文件夹下看到 `install` 文件夹，内有 `x64` 文件夹，即我们需要用到的 `.dll` 文件。
 <br><br>
@@ -81,7 +82,7 @@ yolo_net.setPreferableBackend(cv::dnn::DNN_BACKEND_CUDA);
 yolo_net.setPreferableTarget(cv::dnn::DNN_TARGET_CUDA);
 ```
 - 尝试运行项目，若能成功允许则配置成功。
-- 打开 `Windows任务管理器` ，查看项目运行时， CPU 与 GPU 的占用率，一般而言，在 CPU 为 `i7-4790` 的工控电脑上， CPU 占用率基本上维持在 10% 以下。
+- 打开 `Windows任务管理器` ，查看项目运行时， CPU 与 GPU 的占用率，一般而言，在 CPU 为 `i7-4790` ， GPU 为 `GT 1030` 的工控电脑上， CPU 占用率基本上维持在 10% 以下。
 <br><br>
 
 ## 程序功能
