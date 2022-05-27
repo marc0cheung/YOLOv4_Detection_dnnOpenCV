@@ -1,5 +1,7 @@
 # 基于 YOLOv4-Tiny 的遥控器实时检测软件（ Python 实现）
 
+选择语言：[英文](https://github.com/marc0cheung/YOLOv4_Detection_dnnOpenCV/blob/main/Python/README.md) | 简体中文
+
 ## 简介
 
 YOLO 系列深度学习网络深受各界的欢迎。 [AlexeyAB](https://github.com/AlexeyAB/darknet/) 利用 Darknet 实现了 YOLOv4 这一速度与识别率有着较好平衡的目标检测网络。OpenCV 支持 DNN 模块后，可以方便的读取神经网络的权重、架构等文件，进而可以摆脱 Darknet 较慢的检测速率。
@@ -51,7 +53,13 @@ YOLO 系列深度学习网络深受各界的欢迎。 [AlexeyAB](https://github.
 
 <br>
 
+<br>
+
 ## 注意事项
 
 - 本程序只支持英文路径，请在英文路径下保存本程序或者任何本程序所输出的内容。
 - 自定义分辨率功能暂不可用，待下一版更新。
+
+<br>
+
+<br>
