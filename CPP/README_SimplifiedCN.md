@@ -1,5 +1,12 @@
 # 基于 YOLOv4-Tiny 的实时检测软件（C++ 实现）
+**Select Language**:  [English](https://github.com/marc0cheung/YOLOv4_Detection_dnnOpenCV/blob/main/CPP/README.md) | Simplified Chinese
+
+<br>
+
+<br>
+
 ## 简介
+
 OpenCV 中的 dnn 模块用于读取各深度学习技术下的神经网络，并提供了目标检测的实现。在 darknet 主页的介绍中，OpenCV 是 “速度最快的 YOLOv4 目标检测实现”。为了实现 CPU 上的目标检测，选用了 OpenCV 作为基础，利用 C++ 和 Python 分别写了对应的实现。同时，在 C++ 版本的实现中，还提供了 CPU 运算版本与 GPU 运算版本的切换。<br>
 测试中所采用的工控机 CUDA 与 cuDNN 的版本为：<br>
 CUDA: `cuda_10.1.243_426.00_win10.exe`
@@ -90,3 +97,7 @@ yolo_net.setPreferableTarget(cv::dnn::DNN_TARGET_CUDA);
 - 支持 Socket 协议通信，在不同平台、不同应用程序之间传递坐标信息。
 - 支持目标物坐标以 `.json` 格式输出
 - 坐标信息包含矩形框的四个点坐标，以及中心点坐标。
+
+<br>
+
+<br>

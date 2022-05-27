@@ -1,5 +1,11 @@
 # YOLOv4-Tiny Real-Time Detection (C++ Implementation)
 
+**Select Language**: English | [Simplified Chinese](https://github.com/marc0cheung/YOLOv4_Detection_dnnOpenCV/blob/main/CPP/README_SimplifiedCN.md)
+
+<br>
+
+<br>
+
 ## Introduction
 
 The `dnn` module in OpenCV is used to read neural networks under each deep learning technique and provides an implementation of target detection. In the description on the darknet GitHub page, OpenCV is "the fastest YOLOv4 implementation". In order to implement target detection on CPUs, OpenCV was chosen as the basis and the corresponding implementations were written using C++ and Python respectively. The C++ version of the implementation also provides a GPU version code to use Nvidia CUDA as the `dnn` target backend. 
@@ -126,3 +132,7 @@ yolo_net.setPreferableTarget(cv::dnn::DNN_TARGET_CUDA);
 - Support for socket protocol communication to pass coordinate information between different platforms and applications.
 - Support for target coordinates output in `.json` format
 - Coordinate information contains the coordinates of the four points of the rectangular box, as well as the coordinates of the centre point.
+
+<br>
+
+<br>
