@@ -11,7 +11,7 @@ The YOLO family of deep learning networks has been well received by the communit
 
 ## Features
 
-### Python Ver.
+### [Python Ver.](https://github.com/marc0cheung/YOLOv4_Detection_dnnOpenCV/tree/main/Python)
 
 - Easy-to-use GUI interface made by PySide2.
 - Support single image detection.
@@ -21,7 +21,7 @@ The YOLO family of deep learning networks has been well received by the communit
 
 <br>
 
-### C++ Ver.
+### [C++ Ver.](https://github.com/marc0cheung/YOLOv4_Detection_dnnOpenCV/tree/main/CPP)
 
 - Based on OpenCV `highgui.h` , and command lines to output.
 - Accept any neural network as long as the `dnn` module from OpenCV supported. 
