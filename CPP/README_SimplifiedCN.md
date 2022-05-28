@@ -82,15 +82,28 @@ CUDA_ARCH_BIN：选择自己显卡的算力版本，例如 Pascal 架构显卡�
 ### Step 4: VS2019 上配置 OpenCV
 - 系统环境变量中，添加 `D:\opencv\x64_cuda_build\install\x64\vc16\bin`
 - 打开 VS 项目后，`调试` > `属性` 选择所需要配置的对应的平台和位数，例如 `Release X64` 。如果后期发生平台的变更，则需要重新配置环境。
+- 在 `C++` > `常规` > `附加包含目录` 中，添加 `D:\opencv\build\include` 以及 `D:\opencv\build\include\opencv2` 目录。
 - `链接器` > `常规` > `附加库目录` 中，添加 `D:\opencv\x64_cuda_build\install\x64\vc16\lib` ，同时在 `链接器` > `输入` > `附加依赖项` 中，添加 `opencv_world455.lib` （文件名中的数字为 OpenCV 版本号），如果是 `debug` 平台，则添加 `opencv_world455d.lib` 。
 - 运行项目，确定 `main.cpp` 中，所使用的模型运行设置目标设备与计算后台为 CUDA 。如下代码所示：
 ```c++
 yolo_net.setPreferableBackend(cv::dnn::DNN_BACKEND_CUDA);
 yolo_net.setPreferableTarget(cv::dnn::DNN_TARGET_CUDA);
 ```
+- 由于本项目还配置有 JSON 写入功能，所以还需要配置 [jsoncpp](https://github.com/open-source-parsers/jsoncpp) 方可运行。配置方法如下：
+  - 前往 [jsoncpp](https://github.com/open-source-parsers/jsoncpp) 下载源码包，解压后，将文件夹内的 `include` 文件夹复制到本项目目录下。
+  - 将 `jsoncpp-master\src\lib_json` 下的所有 `.cpp` 文件（共三个，分别为 `json_reader.cpp` 、`json_value.cpp` 以及 `json_writer.cpp` ）拷贝到本项目目录下。
+  - 用 VS2019 打开本项目，在项目属性中，在 `C++` > `常规` > `附加包含目录` 中，添加 `D:\YOLO-CPP-CUDA-Socket\include` 目录。
+  - 在本项目的 解决方案资源管理器 中的 源文件 部分，使用 `右键` > `添加` > `现有项` ，将上述的三个来自 jsoncpp 的 `.cpp` 文件添加到 源文件 中。
+
 - 尝试运行项目，若能成功允许则配置成功。
 - 打开 `Windows任务管理器` ，查看项目运行时， CPU 与 GPU 的占用率，一般而言，在 CPU 为 `i7-4790` ， GPU 为 `GT 1030` 的工控电脑上， CPU 占用率基本上维持在 10% 以下。
-<br><br>
+  <br><br>
+
+## 如何切换到 CPU 模式
+
+- 在 `main.cpp` 中，注释掉第 `81` 、 `82` 行两行包含 `CUDA` 的代码。
+- 取消第 `79` 、 `80` 行两行包含 `CPU` 的代码的注释。
+- 在 VS2019 项目属性中，将对应的 OpenCV with CPU 版本上。
 
 ## 程序功能
 - 读取 YOLO 系列网络乃至所有 OpenCV DNN 模块支持介入的神经网络配置文件，并调用神经网络进行目标检测或分割。

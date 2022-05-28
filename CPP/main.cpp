@@ -34,27 +34,27 @@ void* g_Obj = NULL;
 int main()
 {
 	// Socket Communication
-	//定义长度变量
-	int send_len = 0, recv_len = 0;
-	//定义发送缓冲区和接受缓冲区
+	// Define the length of the message
+	int send_len = 0;
+	// Defining the send buffer
 	char send_buf[100];
-	//定义服务端套接字，接受请求套接字
+	// Define server-side sockets and accept request sockets
 	SOCKET s_server;
-	//服务端地址客户端地址
+	// server address
 	SOCKADDR_IN server_addr;
 	socketInitialization();
-	//填充服务端信息
+	// server-side information
 	server_addr.sin_family = AF_INET;
 	server_addr.sin_addr.S_un.S_addr = inet_addr("127.0.0.1");
 	server_addr.sin_port = htons(9999);
-	//创建套接字
+	// Create sockets
 	s_server = socket(AF_INET, SOCK_STREAM, 0);
 	if (connect(s_server, (SOCKADDR*)&server_addr, sizeof(SOCKADDR)) == SOCKET_ERROR) {
-		cout << "接收器连接失败！" << endl;
+		cout << "Fail to establish connection to receiver." << endl;
 		WSACleanup();
 	}
 	else {
-		cout << "接收器连接成功！" << endl;
+		cout << "Successfully connect to receiver." << endl;
 	}
 
 	
@@ -76,8 +76,8 @@ int main()
 	//Define a YOLO net
 	Net yolo_net;
 	yolo_net = readNetFromDarknet("D:/Yolo/YOLO-CPP-Win32/QYoloVisionLib/1.cfg", "D:/Yolo/YOLO-CPP-Win32/QYoloVisionLib/1.weights");
-	//yolo_net.setPreferableBackend(DNN_BACKEND_OPENCV);
-	//yolo_net.setPreferableTarget(DNN_TARGET_CPU);
+	// yolo_net.setPreferableBackend(DNN_BACKEND_OPENCV);
+	// yolo_net.setPreferableTarget(DNN_TARGET_CPU);
 	yolo_net.setPreferableBackend(DNN_BACKEND_CUDA);
 	yolo_net.setPreferableTarget(DNN_TARGET_CUDA);
 
@@ -194,7 +194,7 @@ int main()
 				std::string i_str = std::to_string(i + 1);
 				putText(frame, i_str, Point(box.x + box.width, box.y), FONT_HERSHEY_SIMPLEX, 0.75, Scalar(0, 0, 255), 1);
 
-				//指针偏移：动态创建数组
+				//Pointer offsets: dynamic creation of arrays
 				//Point 1
 				pRect[i * 10 + 0] = box.x;
 				pRect[i * 10 + 1] = box.y;
@@ -276,18 +276,18 @@ void socketInitialization() {
 	int err;
 	err = WSAStartup(w_req, &wsadata);
 	if (err != 0) {
-		cout << "初始化套接字库失败！" << endl;
+		cout << "Failed to initialize the socket library!" << endl;
 	}
 	else {
-		cout << "初始化套接字库成功！" << endl;
+		cout << "Initialization of socket library successful!" << endl;
 	}
 	// check version
 	if (LOBYTE(wsadata.wVersion) != 2 || HIBYTE(wsadata.wHighVersion) != 2) {
-		cout << "套接字库版本号不符！" << endl;
+		cout << "The socket library version number does not match!" << endl;
 		WSACleanup();
 	}
 	else {
-		cout << "套接字库版本正确！" << endl;
+		cout << "The socket library version is correct! " << endl;
 	}
 
 }

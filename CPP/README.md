@@ -113,6 +113,7 @@ CUDA_ARCH_BIN: choose arithmetic version of the graphics card. (e.g. for Pascal 
 
 - In the system `Path` environment variables, add `D:\opencv\x64_cuda_build\install\x64\vc16\bin`.
 - After opening the VS project, `Debug` > `Properties` select the corresponding platform and bit number you need to configure, e.g. `Release X64`. If the platform changes later on, the environment will need to be reconfigured.
+- In `C++` > `General` > `Additional include directories`, add the `D:\opencv\build\include` and `D:\opencv\build\include\opencv2` directories.
 - In `Linker` > `General` > `Additional libraries directory`, add `D:\opencv\x64_cuda_build\install\x64\vc16\lib`, and in `Linker` > `Input` > `Additional dependencies`, add `opencv_world455.lib` (for `release` , the number in the file name is the (the number in the file name is the OpenCV version number), or `opencv_world455d.lib` if it is a `debug` platform.
 - Run the project and make sure that the model run used in `main.cpp` sets the target device and compute backend to CUDA. The following code is shown.
 
@@ -120,6 +121,16 @@ CUDA_ARCH_BIN: choose arithmetic version of the graphics card. (e.g. for Pascal 
 yolo_net.setPreferableBackend(cv::dnn::DNN_BACKEND_CUDA);
 yolo_net.setPreferableTarget(cv::dnn::DNN_TARGET_CUDA);
 ```
+
+- As this project is also configured for JSON writing, you will also need to configure [jsoncpp](https://github.com/open-source-parsers/jsoncpp) to run. The configuration is as follows.
+
+  - Download the source package from [jsoncpp](https://github.com/open-source-parsers/jsoncpp), unzip it, and copy the `include` folder to the project directory.
+
+  - Copy all the `.cpp` files under `jsoncpp-master\src\lib_json` (three in total, `json_reader.cpp`, `json_value.cpp` and `json_writer.cpp`) to the project directory.
+
+  - Open the project in VS2019 and in the project properties, under `C++` > `General` > `Additional Inclusion Directories`, add the `D:\YOLO-CPP-CUDA-Socket\include` directory.
+
+  - In the Sources section of the project's Solution Explorer, use `Right click` > `Add` > `Existing items` to add the three `.cpp` files from [jsoncpp](https://github.com/open-source-parsers/jsoncpp) above to the sources.
 
 - Try to run the project, if it is allowed successfully then the configuration is successful.
 - Open `Windows Task Manager` and check the CPU and GPU usage while the project is running. In general, on an IPC with an `i7-4790` CPU and `GT 1030` GPU, the CPU usage is basically below 10%.
