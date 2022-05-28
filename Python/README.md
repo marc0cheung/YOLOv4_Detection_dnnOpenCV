@@ -1,4 +1,4 @@
-# YOLOv4-Tiny Remote Control Detection ( Python Implementation)
+# YOLOv4-Tiny Remote Control Detection (Python Implementation)
 
 **Select Language**: English | [Simplified Chinese](https://github.com/marc0cheung/YOLOv4_Detection_dnnOpenCV/blob/main/Python/README_SimplifiedCN.md)
 
