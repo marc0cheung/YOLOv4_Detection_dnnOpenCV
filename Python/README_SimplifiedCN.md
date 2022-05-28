@@ -1,4 +1,4 @@
-# 基于 YOLOv4-Tiny 的遥控器实时检测软件（ Python 实现）
+# 基于 YOLOv4-Tiny 的遥控器实时检测软件（Python 实现）
 
 选择语言：[英文](https://github.com/marc0cheung/YOLOv4_Detection_dnnOpenCV/blob/main/Python/README.md) | 简体中文
 
