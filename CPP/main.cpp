@@ -27,7 +27,7 @@ using namespace cv;
 using namespace dnn;
 
 void socketInitialization();
-void writeFileJson(void* pObj, int nNum, int* pRectPoints);
+void writeFileJson(void* pObj, int nNum, double duration, int* pRectPoints);
 
 void* g_Obj = NULL;
 
@@ -76,10 +76,10 @@ int main()
 	//Define a YOLO net
 	Net yolo_net;
 	yolo_net = readNetFromDarknet("D:/Yolo/YOLO-CPP-Win32/QYoloVisionLib/1.cfg", "D:/Yolo/YOLO-CPP-Win32/QYoloVisionLib/1.weights");
-	// yolo_net.setPreferableBackend(DNN_BACKEND_OPENCV);
-	// yolo_net.setPreferableTarget(DNN_TARGET_CPU);
-	yolo_net.setPreferableBackend(DNN_BACKEND_CUDA);
-	yolo_net.setPreferableTarget(DNN_TARGET_CUDA);
+	yolo_net.setPreferableBackend(DNN_BACKEND_OPENCV);
+	yolo_net.setPreferableTarget(DNN_TARGET_CPU);
+	//yolo_net.setPreferableBackend(DNN_BACKEND_CUDA);
+	//yolo_net.setPreferableTarget(DNN_TARGET_CUDA);
 
 	//Open USB Camera
 	VideoCapture cap(0);
@@ -92,9 +92,13 @@ int main()
 	Mat frame;
 
 	clock_t start, finish; // Use these vars to record the YOLO processing time
+	double tick_ori = static_cast<double>(getTickCount());  // Get Original Tick Count 
 
 	while (1)
 	{
+		double timex = static_cast<double>(getTickCount());
+		timex = (timex - tick_ori) / getTickFrequency();  // now_tickCount - Original_Tick_Count = Program running time
+		
 		cap >> frame;
 		if (frame.empty()) break;
 		Size dsize = Size(960, 540);  //Set Video Stream Resolution
@@ -150,25 +154,10 @@ int main()
 		vector<int> indices;
 		NMSBoxes(boxes, confidences, confThreshold, nmsThreshold, indices);
 
-		// Draw Predict Boxes and output coordinates
-		for (size_t i = 0; i < indices.size(); ++i)
-		{
-			int idx = indices[i];
-			Rect box = boxes[idx];
-			rectangle(frame, Point(box.x, box.y), Point(box.x + box.width, box.y + box.height), Scalar(0, 0, 255), 1);
-			string label = format("%.2f", confidences[idx]);
-			if (!classes.empty())
-			{
-				CV_Assert(classIds[idx] < (int)classes.size());
-				label = classes[classIds[idx]] + ":" + label;
-			}
-			int baseLine;
-			Size labelSize = getTextSize(label, FONT_HERSHEY_SIMPLEX, 0.5, 1, &baseLine);
-			box.y = max(box.y, labelSize.height);
-			putText(frame, label, Point(box.x, box.y), FONT_HERSHEY_SIMPLEX, 0.75, Scalar(0, 255, 0), 1);
-			std::string i_str = std::to_string(i + 1);
-			putText(frame, i_str, Point(box.x + box.width, box.y), FONT_HERSHEY_SIMPLEX, 0.75, Scalar(0, 0, 255), 1);
-		}
+		// End Timer
+		finish = clock();
+		double  duration;
+		duration = (double)(finish - start);
 
 		//Draw Predict Boxes
 		if (indices.size() > 0)
@@ -193,6 +182,8 @@ int main()
 				putText(frame, label, Point(box.x, box.y), FONT_HERSHEY_SIMPLEX, 0.75, Scalar(0, 255, 0), 1);
 				std::string i_str = std::to_string(i + 1);
 				putText(frame, i_str, Point(box.x + box.width, box.y), FONT_HERSHEY_SIMPLEX, 0.75, Scalar(0, 0, 255), 1);
+				// Output box.x coordinates on the frame
+				putText(frame, "box.x: " + to_string(box.x), Point(20, 160), FONT_HERSHEY_SIMPLEX, 1, Scalar(0, 0, 255), 2, 4);
 
 				//Pointer offsets: dynamic creation of arrays
 				//Point 1
@@ -213,23 +204,18 @@ int main()
 
 				
 				// Write Coordinates to coordinates.json using JSONCPP Library
-				writeFileJson(g_Obj, indices.size(), pRect);
+				writeFileJson(g_Obj, indices.size(), duration, pRect);
 
 
 				// Use String to send coordinates to receiver, but needs decoding process.
 				String sendData;
-				sendData += " Object_";  sendData += to_string(i + 1);
-				sendData += "\n[(";
-				sendData += to_string(box.x);  sendData += ",";  sendData += to_string(box.y);
-				sendData += ")-(";
-				sendData += to_string(box.x + box.width);  sendData += ",";   sendData += to_string(box.y);
-				sendData += ")-(";
-				sendData += to_string(box.x);  sendData += ",";   sendData += to_string(box.y + box.height);
-				sendData += ")-(";
-				sendData += to_string(box.x + box.width);  sendData += ",";   sendData += to_string(box.y + box.height);
-				sendData += ")-(";
-				sendData += to_string(box.x + (box.width / 2));  sendData += ",";   sendData += to_string(box.y + (box.height / 2));
-				sendData += ")]\n";
+				sendData += "Object_" + to_string(i + 1) + "\n[(";                                              // Object Count
+				sendData += to_string(box.x) + "," + to_string(box.y) + ")-(";                                 // Point 1
+				sendData += to_string(box.x + box.width) + "," + to_string(box.y) + ")-(";                    // Point 2
+				sendData += to_string(box.x) + ", " + to_string(box.y + box.height) + ")-(";                 // Point 3
+				sendData += to_string(box.x + box.width)+ "," + to_string(box.y + box.height) + ")-(";      // Point 4
+				sendData += to_string(box.x + (box.width / 2)) + "," + to_string(box.y + (box.height / 2)) + ")-";  // Point 5
+				sendData += to_string((int)duration) + "]";      // Processing Time
 				cout << sendData << endl;
 				strcpy(send_buf, sendData.c_str());
 				send_len = send(s_server, send_buf, 100, 0);
@@ -238,14 +224,10 @@ int main()
 			delete[]pRect;
 		}
 
-		// End Timer
-		finish = clock();
-		double  duration;
-		duration = (double)(finish - start);
-
 		// Put YOLO Processing Time and YOLO FPS to the frame
-		putText(frame, to_string((int)duration)+" ms", Point(20, 40), FONT_HERSHEY_SIMPLEX, 1, Scalar(0, 0, 255), 2, 4);
+		putText(frame, "Delay: " + to_string((int)duration) + " ms", Point(20, 40), FONT_HERSHEY_SIMPLEX, 1, Scalar(0, 0, 255), 2, 4);
 		putText(frame, "FPS: " + to_string((int)(1000 / (int)duration)), Point(20, 80), FONT_HERSHEY_SIMPLEX, 1, Scalar(0, 0, 255), 2, 4);
+		putText(frame, "RunTime: " + to_string((int)timex) + " s", Point(20, 120), FONT_HERSHEY_SIMPLEX, 1, Scalar(0, 0, 255), 2, 4);
 		// Display Video Stream
 		imshow("OpenCV DNN", frame);
 
@@ -293,7 +275,7 @@ void socketInitialization() {
 }
 
 
-void writeFileJson(void* pObj, int nNum, int* pRectPoints)
+void writeFileJson(void* pObj, int nNum, double duration, int* pRectPoints)
 {
 	//nNum: object count； pRectPoints：predict box coordinates
 	// JSON root node
@@ -318,12 +300,15 @@ void writeFileJson(void* pObj, int nNum, int* pRectPoints)
 		String Point5 = to_string(pRectPoints[i * 10 + 8]).append(",");
 		Point5.append(to_string(pRectPoints[i * 10 + 9]));
 
+		String ProcessTime = to_string((int)duration);
+
 		// child nodes, 5 coordinates
 		Object[i]["Point_1"] = Json::Value(Point1);
 		Object[i]["Point_2"] = Json::Value(Point2);
 		Object[i]["Point_3"] = Json::Value(Point3);
 		Object[i]["Point_4"] = Json::Value(Point4);
 		Object[i]["Point_5"] = Json::Value(Point5);
+		Object[i]["Time"] = Json::Value(ProcessTime);
 
 
 		//load child nodes to root node
@@ -346,7 +331,8 @@ void writeFileJson(void* pObj, int nNum, int* pRectPoints)
 
 	// generate JSON file
 	ofstream os;
-	os.open("coordinates.json", std::ios::out | std::ios::app);
+	//os.open("coordinates.json", std::ios::out | std::ios::app);  // Uncomment this line to output all coordinates to json file
+	os.open("coordinates.json");  // Output coordinates of the last frame to json file only
 	if (!os.is_open())
 		cout << "error：can not find or create the file which named \" coordinates.json\"." << endl;
 	os << sw.write(root);
