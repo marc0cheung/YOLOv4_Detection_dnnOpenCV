@@ -22,6 +22,17 @@
 #include<cstring>
 #pragma comment(lib, "ws2_32.lib")
 
+// Function Switch, 1 = on / true, 0 = off / false
+#define JSONOnlyOne    1
+#define OpenSocket     0
+#define DisplayBoxX    1
+#define DisplayRunTime 1 
+#define VideoStream    1
+#define VideoSize      960, 540
+#define cfgFile        "D:/Yolo/YOLO-CPP-Win32/QYoloVisionLib/1.cfg"
+#define weightsFile    "D:/Yolo/YOLO-CPP-Win32/QYoloVisionLib/1.weights"
+#define namesFile      "D:/Yolo/YOLO-CPP-Win32/QYoloVisionLib/1.names"
+
 using namespace std;
 using namespace cv;
 using namespace dnn;
@@ -60,7 +71,7 @@ int main()
 	
 	// Get Object Name(s)
 	vector<string> classes;  //for Object Name(s)
-	String classesFile = "D:/Yolo/YOLO-CPP-Win32/QYoloVisionLib/1.names";
+	String classesFile = namesFile;
 
 	ifstream ifs(classesFile.c_str());
 	string line;
@@ -75,7 +86,7 @@ int main()
 
 	//Define a YOLO net
 	Net yolo_net;
-	yolo_net = readNetFromDarknet("D:/Yolo/YOLO-CPP-Win32/QYoloVisionLib/1.cfg", "D:/Yolo/YOLO-CPP-Win32/QYoloVisionLib/1.weights");
+	yolo_net = readNetFromDarknet(cfgFile, weightsFile);
 	yolo_net.setPreferableBackend(DNN_BACKEND_OPENCV);
 	yolo_net.setPreferableTarget(DNN_TARGET_CPU);
 	//yolo_net.setPreferableBackend(DNN_BACKEND_CUDA);
@@ -101,7 +112,7 @@ int main()
 		
 		cap >> frame;
 		if (frame.empty()) break;
-		Size dsize = Size(960, 540);  //Set Video Stream Resolution
+		Size dsize = Size(VideoSize);  //Set Video Stream Resolution
 		resize(frame, frame, dsize, 0, 0, INTER_AREA);
 
 		//Start timer
@@ -182,8 +193,12 @@ int main()
 				putText(frame, label, Point(box.x, box.y), FONT_HERSHEY_SIMPLEX, 0.75, Scalar(0, 255, 0), 1);
 				std::string i_str = std::to_string(i + 1);
 				putText(frame, i_str, Point(box.x + box.width, box.y), FONT_HERSHEY_SIMPLEX, 0.75, Scalar(0, 0, 255), 1);
-				// Output box.x coordinates on the frame
-				putText(frame, "box.x: " + to_string(box.x), Point(20, 160), FONT_HERSHEY_SIMPLEX, 1, Scalar(0, 0, 255), 2, 4);
+				
+				if (DisplayBoxX == 1)
+				{
+					// Output box.x coordinates on the frame
+					putText(frame, "box.x: " + to_string(box.x), Point(20, 160), FONT_HERSHEY_SIMPLEX, 1, Scalar(0, 0, 255), 2, 4);
+				}
 
 				//Pointer offsets: dynamic creation of arrays
 				//Point 1
@@ -216,9 +231,13 @@ int main()
 				sendData += to_string(box.x + box.width)+ "," + to_string(box.y + box.height) + ")-(";      // Point 4
 				sendData += to_string(box.x + (box.width / 2)) + "," + to_string(box.y + (box.height / 2)) + ")-";  // Point 5
 				sendData += to_string((int)duration) + "]";      // Processing Time
-				cout << sendData << endl;
-				strcpy(send_buf, sendData.c_str());
-				send_len = send(s_server, send_buf, 100, 0);
+				
+				if (OpenSocket == 1)
+				{
+					cout << sendData << endl;
+					strcpy(send_buf, sendData.c_str());
+					send_len = send(s_server, send_buf, 100, 0);
+				}
 
 			}
 			delete[]pRect;
@@ -227,14 +246,22 @@ int main()
 		// Put YOLO Processing Time and YOLO FPS to the frame
 		putText(frame, "Delay: " + to_string((int)duration) + " ms", Point(20, 40), FONT_HERSHEY_SIMPLEX, 1, Scalar(0, 0, 255), 2, 4);
 		putText(frame, "FPS: " + to_string((int)(1000 / (int)duration)), Point(20, 80), FONT_HERSHEY_SIMPLEX, 1, Scalar(0, 0, 255), 2, 4);
-		putText(frame, "RunTime: " + to_string((int)timex) + " s", Point(20, 120), FONT_HERSHEY_SIMPLEX, 1, Scalar(0, 0, 255), 2, 4);
-		// Display Video Stream
-		imshow("OpenCV DNN", frame);
-
-		if (getWindowProperty("OpenCV DNN", WND_PROP_VISIBLE) < 1)
+		
+		if (DisplayRunTime == 1)
 		{
-			cap.release();
-			break;
+			putText(frame, "RunTime: " + to_string((int)timex) + " s", Point(20, 120), FONT_HERSHEY_SIMPLEX, 1, Scalar(0, 0, 255), 2, 4);
+		}
+
+		if (VideoStream == 1)
+		{
+			// Display Video Stream
+			imshow("OpenCV DNN", frame);
+
+			if (getWindowProperty("OpenCV DNN", WND_PROP_VISIBLE) < 1)
+			{
+				cap.release();
+				break;
+			}
 		}
 
 		if (waitKey(33) >= 0) break;
@@ -331,8 +358,16 @@ void writeFileJson(void* pObj, int nNum, double duration, int* pRectPoints)
 
 	// generate JSON file
 	ofstream os;
-	//os.open("coordinates.json", std::ios::out | std::ios::app);  // Uncomment this line to output all coordinates to json file
-	os.open("coordinates.json");  // Output coordinates of the last frame to json file only
+	
+	if (JSONOnlyOne == 1)
+	{
+		os.open("coordinates.json");  // Output coordinates of the last frame to json file only
+	}
+	else
+	{
+		os.open("coordinates.json", std::ios::out | std::ios::app);  // Output all coordinates in one .json file
+	}
+
 	if (!os.is_open())
 		cout << "error：can not find or create the file which named \" coordinates.json\"." << endl;
 	os << sw.write(root);
