@@ -369,7 +369,7 @@ void writeFileJson(void* pObj, int nNum, double duration, int* pRectPoints)
 	}
 
 	if (!os.is_open())
-		cout << "error：can not find or create the file which named \" coordinates.json\"." << endl;
+		cout << "error: can not find or create the file which named \" coordinates.json\"." << endl;
 	os << sw.write(root);
 	os.close();
 
