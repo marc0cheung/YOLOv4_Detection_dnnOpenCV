@@ -22,20 +22,22 @@
 #include<cstring>
 #pragma comment(lib, "ws2_32.lib")
 
-// Function Switch, 1 = on / true, 0 = off / false
-#define JSONOnlyOne    1
-#define OpenSocket     0
-#define DisplayBoxX    1
-#define DisplayRunTime 1 
-#define VideoStream    1
-#define VideoSize      960, 540
-#define cfgFile        "D:/Yolo/YOLO-CPP-Win32/QYoloVisionLib/1.cfg"
-#define weightsFile    "D:/Yolo/YOLO-CPP-Win32/QYoloVisionLib/1.weights"
-#define namesFile      "D:/Yolo/YOLO-CPP-Win32/QYoloVisionLib/1.names"
-
 using namespace std;
 using namespace cv;
 using namespace dnn;
+
+// Function Switch, 1 = on / true, 0 = off / false
+#define Backend        "CPU"
+#define WriteJSON      0
+#define JSONOnlyOne    1
+#define OpenSocket     1
+#define DisplayBoxX    0
+#define DisplayRunTime 0 
+#define VideoStream    1
+#define VideoSize      960, 540
+#define cfgFile        "./network/1.cfg"
+#define weightsFile    "./network/1.weights"
+#define namesFile      "./network/1.names"
 
 void socketInitialization();
 void writeFileJson(void* pObj, int nNum, double duration, int* pRectPoints);
@@ -87,10 +89,17 @@ int main()
 	//Define a YOLO net
 	Net yolo_net;
 	yolo_net = readNetFromDarknet(cfgFile, weightsFile);
-	yolo_net.setPreferableBackend(DNN_BACKEND_OPENCV);
-	yolo_net.setPreferableTarget(DNN_TARGET_CPU);
-	//yolo_net.setPreferableBackend(DNN_BACKEND_CUDA);
-	//yolo_net.setPreferableTarget(DNN_TARGET_CUDA);
+
+	if (Backend == "CPU")
+	{
+		yolo_net.setPreferableBackend(DNN_BACKEND_OPENCV);
+		yolo_net.setPreferableTarget(DNN_TARGET_CPU);
+	}
+	else if (Backend == "GPU")
+	{
+		yolo_net.setPreferableBackend(DNN_BACKEND_CUDA);
+		yolo_net.setPreferableTarget(DNN_TARGET_CUDA);
+	}
 
 	//Open USB Camera
 	VideoCapture cap(0);
@@ -107,6 +116,7 @@ int main()
 
 	while (1)
 	{
+		// Calculate Programme Running Time
 		double timex = static_cast<double>(getTickCount());
 		timex = (timex - tick_ori) / getTickFrequency();  // now_tickCount - Original_Tick_Count = Program running time
 		
@@ -114,8 +124,9 @@ int main()
 		if (frame.empty()) break;
 		Size dsize = Size(VideoSize);  //Set Video Stream Resolution
 		resize(frame, frame, dsize, 0, 0, INTER_AREA);
+		flip(frame, frame, -1);
 
-		//Start timer
+		//Start timer, use to calculate how long does YOLOv4-Tiny process a frame
 		start = clock();
 
 		// Use YOLOv4-Tiny Net to Detect Object
@@ -197,7 +208,7 @@ int main()
 				if (DisplayBoxX == 1)
 				{
 					// Output box.x coordinates on the frame
-					putText(frame, "box.x: " + to_string(box.x), Point(20, 160), FONT_HERSHEY_SIMPLEX, 1, Scalar(0, 0, 255), 2, 4);
+					putText(frame, "box.x: " + to_string(boxes[0].x), Point(20, 160), FONT_HERSHEY_SIMPLEX, 1, Scalar(0, 0, 255), 2, 4);
 				}
 
 				//Pointer offsets: dynamic creation of arrays
@@ -218,8 +229,11 @@ int main()
 				pRect[i * 10 + 9] = (box.y + box.height) / 2;
 
 				
-				// Write Coordinates to coordinates.json using JSONCPP Library
-				writeFileJson(g_Obj, indices.size(), duration, pRect);
+				if (WriteJSON == 1)
+				{
+					// Write Coordinates to coordinates.json using JSONCPP Library
+					writeFileJson(g_Obj, indices.size(), duration, pRect);
+				}
 
 
 				// Use String to send coordinates to receiver, but needs decoding process.
@@ -270,10 +284,12 @@ int main()
 
 	//waitKey(0);
 	//destroyAllWindows();
-	//关闭套接字
+
+	// Close Socket Communication
 	closesocket(s_server);
-	//释放DLL资源
+	// Release DLL Resources
 	WSACleanup();
+	
 	return 0;
 }
 
@@ -310,7 +326,7 @@ void writeFileJson(void* pObj, int nNum, double duration, int* pRectPoints)
 
 	for (int i = 0; i < nNum; i++)
 	{
-		Json::Value Object[10];
+		Json::Value Object[10];  // 10 objects at 1 frame at most
 
 		String Point1 = to_string(pRectPoints[i * 10 + 0]).append(",");
 		Point1.append(to_string(pRectPoints[i * 10 + 1]));
