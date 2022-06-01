@@ -36,7 +36,7 @@ using namespace dnn;
 #define OpenSocket          1
 #define SocketServerAddress "127.0.0.1"
 #define SocketPort          9999
-#define outputSocketMessage 1
+#define outputSocketMessage 0
 // Video Stream UI Configuration
 #define DisplayBoxX         0
 #define DisplayRunTime      0 
@@ -51,7 +51,6 @@ using namespace dnn;
 #define namesFile           "./network/1.names"
 
 void socketInitialization();
-void writeFileJson(void* pObj, int nNum, double duration, int* pRectPoints);
 
 void* g_Obj = NULL;
 
