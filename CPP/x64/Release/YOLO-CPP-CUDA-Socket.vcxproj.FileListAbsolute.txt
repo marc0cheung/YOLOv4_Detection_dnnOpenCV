@@ -1,2 +1,0 @@
-D:\Yolo\YOLO-CPP-CUDA-Socket\x64\Release\YOLO-CPP-CUDA-Socket.exe
-D:\YOLO-CPP-CUDA-Socket\x64\Release\YOLO-CPP-CUDA-Socket.exe

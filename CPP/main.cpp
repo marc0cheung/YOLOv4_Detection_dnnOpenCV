@@ -27,22 +27,37 @@ using namespace cv;
 using namespace dnn;
 
 // Function Switch, 1 = on / true, 0 = off / false
-#define Backend        "CPU"
-#define WriteJSON      0
-#define JSONOnlyOne    1
-#define OpenSocket     1
-#define DisplayBoxX    0
-#define DisplayRunTime 0 
-#define VideoStream    1
-#define VideoSize      960, 540
-#define cfgFile        "./network/1.cfg"
-#define weightsFile    "./network/1.weights"
-#define namesFile      "./network/1.names"
+// ===============================================
+// JSON Configuration
+#define WriteJSON           1
+#define JSONOnlyOne         1  // need to keep this open.
+#define outputJsonWriter    0
+// Socket Configuration
+#define OpenSocket          1
+#define SocketServerAddress "127.0.0.1"
+#define SocketPort          9999
+#define outputSocketMessage 1
+// Video Stream UI Configuration
+#define DisplayBoxX         0
+#define DisplayRunTime      0 
+// Video Configuration
+#define VideoStream         1
+#define VideoFlip           1
+#define VideoSize           960, 540
+// YOLO network Configuration
+#define Backend             "GPU"
+#define cfgFile             "./network/1.cfg"
+#define weightsFile         "./network/1.weights"
+#define namesFile           "./network/1.names"
 
 void socketInitialization();
 void writeFileJson(void* pObj, int nNum, double duration, int* pRectPoints);
 
 void* g_Obj = NULL;
+
+Json::Value root;
+Json::Value Detected;
+Json::Value Objects;
 
 int main()
 {
@@ -58,8 +73,8 @@ int main()
 	socketInitialization();
 	// server-side information
 	server_addr.sin_family = AF_INET;
-	server_addr.sin_addr.S_un.S_addr = inet_addr("127.0.0.1");
-	server_addr.sin_port = htons(9999);
+	server_addr.sin_addr.S_un.S_addr = inet_addr(SocketServerAddress);
+	server_addr.sin_port = htons(SocketPort);
 	// Create sockets
 	s_server = socket(AF_INET, SOCK_STREAM, 0);
 	if (connect(s_server, (SOCKADDR*)&server_addr, sizeof(SOCKADDR)) == SOCKET_ERROR) {
@@ -69,6 +84,13 @@ int main()
 	else {
 		cout << "Successfully connect to receiver." << endl;
 	}
+
+	if (OpenSocket == 0)
+	{
+		cout << "\n[!!!] Socket initialized but Socket is set to CLOSED status.\n" << endl;
+	}
+	else
+		cout << "Socket initialized and Socket Communication is OPEN." << endl;
 
 	
 	// Get Object Name(s)
@@ -83,13 +105,14 @@ int main()
 	// Set net argvs
 	float confThreshold = 0.9; // Confidence threshold
 	float nmsThreshold = 0.4;  // Non-maximum suppression threshold
-	int inpWidth = 416;  // Width of network's input image
-	int inpHeight = 416; // Height of network's input image
+	int inpWidth = 416;        // Width of network's input image
+	int inpHeight = 416;       // Height of network's input image
 
-	//Define a YOLO net
+	// Define a YOLO net
 	Net yolo_net;
 	yolo_net = readNetFromDarknet(cfgFile, weightsFile);
 
+	// Set OpenCV dnn Backend and Target
 	if (Backend == "CPU")
 	{
 		yolo_net.setPreferableBackend(DNN_BACKEND_OPENCV);
@@ -113,6 +136,7 @@ int main()
 
 	clock_t start, finish; // Use these vars to record the YOLO processing time
 	double tick_ori = static_cast<double>(getTickCount());  // Get Original Tick Count 
+	int loopCount = 0;
 
 	while (1)
 	{
@@ -124,7 +148,10 @@ int main()
 		if (frame.empty()) break;
 		Size dsize = Size(VideoSize);  //Set Video Stream Resolution
 		resize(frame, frame, dsize, 0, 0, INTER_AREA);
-		flip(frame, frame, -1);
+		if (VideoFlip == 1)
+		{
+			flip(frame, frame, -1);
+		}
 
 		//Start timer, use to calculate how long does YOLOv4-Tiny process a frame
 		start = clock();
@@ -184,9 +211,8 @@ int main()
 		//Draw Predict Boxes
 		if (indices.size() > 0)
 		{
-			Json::Value root;
 			// Object_Count * 2 value per Coord * 5_Coordinates
-			int* pRect = new int[indices.size() * 2 * 5];
+			//int* pRect = new int[indices.size() * 2 * 5];
 			for (size_t i = 0; i < indices.size(); ++i)
 			{
 				int idx = indices[i];
@@ -213,53 +239,85 @@ int main()
 
 				//Pointer offsets: dynamic creation of arrays
 				//Point 1
-				pRect[i * 10 + 0] = box.x;
-				pRect[i * 10 + 1] = box.y;
-				//Point 2
-				pRect[i * 10 + 2] = box.x + box.width;
-				pRect[i * 10 + 3] = box.y;
-				//Point 3
-				pRect[i * 10 + 4] = box.x;
-				pRect[i * 10 + 5] = box.y + box.height;
-				//Point 4
-				pRect[i * 10 + 6] = box.x + box.width;
-				pRect[i * 10 + 7] = box.y + box.height;
-				//Point 5 (center point)
-				pRect[i * 10 + 8] = (box.x + box.width) / 2;
-				pRect[i * 10 + 9] = (box.y + box.height) / 2;
+				//pRect[i * 10 + 0] = box.x;   
+				//pRect[i * 10 + 1] = box.y;   
+				////Point 2
+				//pRect[i * 10 + 2] = box.x + box.width;
+				//pRect[i * 10 + 3] = box.y;
+				////Point 3
+				//pRect[i * 10 + 4] = box.x;
+				//pRect[i * 10 + 5] = box.y + box.height;
+				////Point 4
+				//pRect[i * 10 + 6] = box.x + box.width;
+				//pRect[i * 10 + 7] = box.y + box.height;
+				////Point 5 (center point)
+				//pRect[i * 10 + 8] = (box.x + box.width) / 2;
+				//pRect[i * 10 + 9] = (box.y + box.height) / 2;
 
 				
 				if (WriteJSON == 1)
 				{
 					// Write Coordinates to coordinates.json using JSONCPP Library
-					writeFileJson(g_Obj, indices.size(), duration, pRect);
+					//writeFileJson(g_Obj, indices.size(), duration, pRect);
+					//Objects["Point1"] = Json::Value(to_string(box.x) + "," + to_string(box.y));
+					//Objects["Point2"] = Json::Value(to_string(box.x + box.width) + "," + to_string(box.y));
+					//Objects["Point3"] = Json::Value(to_string(box.x) + ", " + to_string(box.y + box.height));
+					//Objects["Point4"] = Json::Value(to_string(box.x + box.width) + "," + to_string(box.y + box.height));
+					//Objects["Point5"] = Json::Value(to_string(box.x + (box.width / 2)) + "," + to_string(box.y + (box.height / 2)));
+
+					int coordinatesArray[10] = { box.x, box.y , (box.x + box.width) , box.y , box.x , (box.y + box.height) ,
+					(box.x + box.width) , (box.y + box.height) , (box.x + (box.width / 2)) , (box.y + (box.height / 2)) };
+
+					for (int arrayIndx = 0; arrayIndx < 10; arrayIndx++)
+					{
+						Objects.append(coordinatesArray[arrayIndx]);
+					}
+
+					string detected_dst = "Object_" + to_string(i + 1);
+					Detected[detected_dst] = Json::Value(Objects);
+					Objects.clear();
 				}
 
-
-				// Use String to send coordinates to receiver, but needs decoding process.
-				String sendData;
-				sendData += "Object_" + to_string(i + 1) + "\n[(";                                              // Object Count
-				sendData += to_string(box.x) + "," + to_string(box.y) + ")-(";                                 // Point 1
-				sendData += to_string(box.x + box.width) + "," + to_string(box.y) + ")-(";                    // Point 2
-				sendData += to_string(box.x) + ", " + to_string(box.y + box.height) + ")-(";                 // Point 3
-				sendData += to_string(box.x + box.width)+ "," + to_string(box.y + box.height) + ")-(";      // Point 4
-				sendData += to_string(box.x + (box.width / 2)) + "," + to_string(box.y + (box.height / 2)) + ")-";  // Point 5
-				sendData += to_string((int)duration) + "]";      // Processing Time
-				
 				if (OpenSocket == 1)
 				{
-					cout << sendData << endl;
+					// Use String to send coordinates to receiver, but needs decoding process.
+					String sendData;
+					sendData += "Object_" + to_string(i + 1) + "\n[(";                                              // Object Count
+					sendData += to_string(box.x) + "," + to_string(box.y) + ")-(";                                 // Point 1
+					sendData += to_string(box.x + box.width) + "," + to_string(box.y) + ")-(";                    // Point 2
+					sendData += to_string(box.x) + ", " + to_string(box.y + box.height) + ")-(";                 // Point 3
+					sendData += to_string(box.x + box.width)+ "," + to_string(box.y + box.height) + ")-(";      // Point 4
+					sendData += to_string(box.x + (box.width / 2)) + "," + to_string(box.y + (box.height / 2)) + ")-";  // Point 5
+					sendData += to_string((int)duration) + "]";      // Processing Time
+				
+					if (outputSocketMessage == 1)
+						cout << sendData << endl;
 					strcpy(send_buf, sendData.c_str());
 					send_len = send(s_server, send_buf, 100, 0);
 				}
 
 			}
-			delete[]pRect;
+			
+			if (WriteJSON == 1) {
+				string root_dst = "Detected_at_" + to_string(loopCount + 1);
+				root[root_dst] = Detected;
+
+				// JSON Styled Writer output
+				if (outputJsonWriter == 1)
+				{
+					Json::StyledWriter sw;
+					cout << "StyledWriter:" << endl;
+					cout << sw.write(root) << endl << endl;
+				}
+			}
+
+			//delete[]pRect;
 		}
 
 		// Put YOLO Processing Time and YOLO FPS to the frame
 		putText(frame, "Delay: " + to_string((int)duration) + " ms", Point(20, 40), FONT_HERSHEY_SIMPLEX, 1, Scalar(0, 0, 255), 2, 4);
 		putText(frame, "FPS: " + to_string((int)(1000 / (int)duration)), Point(20, 80), FONT_HERSHEY_SIMPLEX, 1, Scalar(0, 0, 255), 2, 4);
+		loopCount++;
 		
 		if (DisplayRunTime == 1)
 		{
@@ -276,6 +334,27 @@ int main()
 				cap.release();
 				break;
 			}
+		}
+
+		if (WriteJSON == 1) 
+		{
+			ofstream os;
+			Json::StyledWriter sw;
+
+			if (JSONOnlyOne == 1)
+			{
+				os.open("coordinates.json");  // Output coordinates of the last frame to json file only
+			}
+			else
+			{
+				os.open("coordinates.json", std::ios::out | std::ios::app);  // Output all coordinates in one .json file
+			}
+			if (!os.is_open())
+				cout << "error: can not find or create the file which named \" coordinates.json\"." << endl;
+			os << sw.write(root);
+			os.close();
+
+			//cout << "JSON DONE!" << endl;
 		}
 
 		if (waitKey(33) >= 0) break;
@@ -314,81 +393,5 @@ void socketInitialization() {
 	else {
 		cout << "The socket library version is correct! " << endl;
 	}
-
-}
-
-
-void writeFileJson(void* pObj, int nNum, double duration, int* pRectPoints)
-{
-	//nNum: object count； pRectPoints：predict box coordinates
-	// JSON root node
-	Json::Value root;
-
-	for (int i = 0; i < nNum; i++)
-	{
-		Json::Value Object[10];  // 10 objects at 1 frame at most
-
-		String Point1 = to_string(pRectPoints[i * 10 + 0]).append(",");
-		Point1.append(to_string(pRectPoints[i * 10 + 1]));
-
-		String Point2 = to_string(pRectPoints[i * 10 + 2]).append(",");
-		Point2.append(to_string(pRectPoints[i * 10 + 3]));
-
-		String Point3 = to_string(pRectPoints[i * 10 + 4]).append(",");
-		Point3.append(to_string(pRectPoints[i * 10 + 5]));
-
-		String Point4 = to_string(pRectPoints[i * 10 + 6]).append(",");
-		Point4.append(to_string(pRectPoints[i * 10 + 7]));
-
-		String Point5 = to_string(pRectPoints[i * 10 + 8]).append(",");
-		Point5.append(to_string(pRectPoints[i * 10 + 9]));
-
-		String ProcessTime = to_string((int)duration);
-
-		// child nodes, 5 coordinates
-		Object[i]["Point_1"] = Json::Value(Point1);
-		Object[i]["Point_2"] = Json::Value(Point2);
-		Object[i]["Point_3"] = Json::Value(Point3);
-		Object[i]["Point_4"] = Json::Value(Point4);
-		Object[i]["Point_5"] = Json::Value(Point5);
-		Object[i]["Time"] = Json::Value(ProcessTime);
-
-
-		//load child nodes to root node
-		String dst = "Object_";
-		dst.append(to_string(i + 1));
-		root[dst] = Json::Value(Object[i]);
-
-	}
-	
-
-	//JSON Fast Writer output
-	//cout << "FastWriter:" << endl;
-	//Json::FastWriter fw;
-	//cout << fw.write(root) << endl << endl;
-
-	// JSON Styled Writer output
-	cout << "StyledWriter:" << endl;
-	Json::StyledWriter sw;
-	cout << sw.write(root) << endl << endl;
-
-	// generate JSON file
-	ofstream os;
-	
-	if (JSONOnlyOne == 1)
-	{
-		os.open("coordinates.json");  // Output coordinates of the last frame to json file only
-	}
-	else
-	{
-		os.open("coordinates.json", std::ios::out | std::ios::app);  // Output all coordinates in one .json file
-	}
-
-	if (!os.is_open())
-		cout << "error: can not find or create the file which named \" coordinates.json\"." << endl;
-	os << sw.write(root);
-	os.close();
-
-	cout << "JSON DONE!" << endl;
 
 }
