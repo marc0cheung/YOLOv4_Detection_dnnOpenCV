@@ -30,4 +30,12 @@ The YOLO family of deep learning networks has been well received by the communit
 
 <br>
 
+### [C++ with Qt5 GUI](https://github.com/marc0cheung/YOLOv4_Detection_dnnOpenCV/tree/main/CPP-Qt)
+- Based on Qt 5.15.0, OpenCV 4.5.5, and C++. Use Qt>TextBrowser to output/log.
+- Accept any neural network as long as the `dnn` module from OpenCV supported. 
+- Support Socket Communication with other applications or machines, use this protocol to send coordinates of objects.
+- Support `.json` file output coordinates of objects detected, use [jsoncpp](https://github.com/open-source-parsers/jsoncpp).
+
+<br>
+
 <br>
