@@ -18,7 +18,7 @@ This software is a real-time implementation of YOLOv4-Tiny network detection bas
 
 ### Mainpage
 
-<img src="https://github.com/marc0cheung/YOLOv4_RemoteDetection_OpenCVDNN/raw/main/Python/README_SimplifiedCN.assets/image-20220523165423786.png" alt="image-20220523165423786" style="zoom: 50%;" />
+<img src="https://github.com/marc0cheung/YOLOv4_RemoteDetection_OpenCVDNN/raw/main/Python/README_SimplifiedCN.assets/image-20220523165423786.png" alt="Mainpage" width="300px" />
 
 <br>
 
@@ -35,13 +35,13 @@ This software is a real-time implementation of YOLOv4-Tiny network detection bas
 
 ### Picture Detection Page
 
-<img src="https://github.com/marc0cheung/YOLOv4_RemoteDetection_OpenCVDNN/blob/main/Python/README_SimplifiedCN.assets/image-20220523165747321.png?raw=true" alt="image-20220523165747321" style="zoom: 50%;" />
+<img src="https://github.com/marc0cheung/YOLOv4_RemoteDetection_OpenCVDNN/blob/main/Python/README_SimplifiedCN.assets/image-20220523165747321.png?raw=true" alt="Picture_Detection_Page" width="600px" />
 
 <br>
 
 ### Object Segmentation & Extraction
 
-<img src="https://github.com/marc0cheung/YOLOv4_RemoteDetection_OpenCVDNN/blob/main/Python/README_SimplifiedCN.assets/image-20220523165857078.png?raw=true" style="zoom: 50%;" />
+<img src="https://github.com/marc0cheung/YOLOv4_RemoteDetection_OpenCVDNN/blob/main/Python/README_SimplifiedCN.assets/image-20220523165857078.png?raw=true" alt="Result_Show" width="600px" />
 
 <br>
 
