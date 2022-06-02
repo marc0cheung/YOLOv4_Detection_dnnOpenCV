@@ -16,7 +16,7 @@ CUDA: `cuda_10.1.243_426.00_win10.exe`
 
 cuDNN: `cudnn-10.1-windows10-x64-v8.0.5.39.zip`
 
-This version of the code, based on Qt 5.15.0, OpenCV 4.5.5, provides a convenient, easy-to-use GUI that is close to the Python version (and even has more features in that version, which was a surprise to me) than the C++-only version.
+**This version of the code, based on Qt 5.15.0, OpenCV 4.5.5, provides a convenient, easy-to-use GUI that is close to the Python version (and even has more features in that version, which was a surprise to me) than the C++-only version.**
 
 <br>
 
