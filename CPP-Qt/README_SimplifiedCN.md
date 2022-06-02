@@ -1,5 +1,5 @@
 # 基于 YOLOv4-Tiny 的实时检测软件（C++ 实现）
-**Select Language**:  [English](https://github.com/marc0cheung/YOLOv4_Detection_dnnOpenCV/blob/main/CPP/README.md) | Simplified Chinese
+**Select Language**:  [English](https://github.com/marc0cheung/YOLOv4_Detection_dnnOpenCV/blob/main/CPP-Qt/README.md) | Simplified Chinese
 
 <br>
 
@@ -12,9 +12,24 @@ OpenCV 中的 dnn 模块用于读取各深度学习技术下的神经网络，�
 CUDA: `cuda_10.1.243_426.00_win10.exe`
 
 cuDNN: `cudnn-10.1-windows10-x64-v8.0.5.39.zip`
+
+与纯 C++ 版本的代码相比，这一版代码基于 Qt 5.15.0、OpenCV 4.5.5 提供了与 Python 版本接近（甚至该版本的功能更多，这也是让我感到意外的）的方便、易用的 GUI 。
+
 <br><br>
 
+## 关于是否需要从零开始进行环境配置
+
+- 如果你希望使用 CPU 进行运算，则无需配置任何环境，开箱即用。
+- 如果你希望使用 GPU 对 OpenCV dnn 模块进行加速：
+  - 如果你使用我预先编译好的程序，则除了配置**和我上文所提到的完全相同的**英伟达的 CUDA + cuDNN 环境以外，不需要配置任何环境。但即便如此，我并不能保证这个程序在相同的 CUDA 与 cuDNN 环境下就能够顺利运行。在必要时刻，请从零开始配置 Nvidia 与 OpenCV 之环境，并重新编译该程序，确保其运行在 GPU 上。否则，程序会自动切换到 CPU 运行的模式。
+  - 如果你不使用我预先编译好的程序，那么则需要从零开始配置 Nvidia 与 OpenCV 之环境，并重新编译该程序，确保其运行在 GPU 上。
+
+<br>
+
+<br>
+
 ## 快速配置环境指南（GPU）
+
 利用本人编译好的 `OpenCV with CUDA` 动态运行库，进行快速配置。
 注意：该配置方法仅适用于与本人使用同一 CUDA 和 cuDNN 版本的情况。
 <br>
@@ -101,15 +116,14 @@ yolo_net.setPreferableTarget(cv::dnn::DNN_TARGET_CUDA);
 
 ## 如何切换到 CPU 模式
 
-- 在 `main.cpp` 中，在 Function Switch 板块中，将 `#define Backend "GPU"` 改为  `#define Backend "CPU"` 
-- 在 VS2019 项目属性中，添加上对应的 OpenCV with CPU 版本。
-- 在系统环境变量的 Path 中，也要将 GPU 版本的 OpenCV 路径改为 CPU 版本的 OpenCV 路径。
+- 运行程序，将右下角的 “Use GPU + CUDA” 的勾选框设置为 “关闭” 状态。
 
 <br>
 
 <br>
 
 ## 程序功能
+- 提供一个简单易用的 GUI ，方便用户对本程序的各项设置进行调整。
 - 读取 YOLO 系列网络乃至所有 OpenCV DNN 模块支持介入的神经网络配置文件，并调用神经网络进行目标检测或分割。
 - 支持 Socket 协议通信，在不同平台、不同应用程序之间传递坐标信息。
 - 支持目标物坐标以 `.json` 格式输出
