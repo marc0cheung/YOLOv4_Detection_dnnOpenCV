@@ -165,3 +165,11 @@ yolo_net.setPreferableTarget(cv::dnn::DNN_TARGET_CUDA);
 <br>
 
 <br>
+
+## Current Issues (June 5, 2022)
+
+1. This program was developed and compiled on a computer without an `OpenCV with CUDA` environment. If ported directly to a computer with an `OpenCV with CUDA` environment for application, OpenCV may not be able to call the CUDA environment for detection acceleration.
+2. During the writing of the `.json` file, it seems that the object coordinates are not written in the order according to the  `loopCount` values defined in the code, and the JSON file always ends up with the object coordinates corresponding to `Detected_at_99`. However, the JSON file does grow in size as the detection time continues.
+3. The `.json` file can become very large if the program is running for a long time because the program is constantly writing coordinates to the `.json` file. It is therefore recommended to turn **OFF** the __[Write JSON]__ function if this is not needed very much.
+
+<br>

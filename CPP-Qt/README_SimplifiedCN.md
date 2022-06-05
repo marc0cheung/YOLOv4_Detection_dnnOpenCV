@@ -132,3 +132,12 @@ yolo_net.setPreferableTarget(cv::dnn::DNN_TARGET_CUDA);
 <br>
 
 <br>
+
+## 当前存在的问题（2022年6月5日）
+
+1. 本程序是在没有 OpenCV with CUDA 环境的电脑上开发、编译的。如果直接移植到具有 OpenCV with CUDA 环境的电脑上进行应用，可能会出现 OpenCV 无法调用 CUDA 环境进行加速的情况。
+2. 在写入 `.json` 文件过程中，目标物的坐标似乎并不是按照代码中定义的 loopCount 值进行顺序写入，最后 JSON 文件的末尾总是为 Detected_at_99 对应的坐标。但 JSON 文件的体积确实会随着检测时间的持续而增长。
+3. 由于程序不停地将坐标写入 `.json` 文件，所以在程序运行时间较长的情况下， `.json` 文件可能会变得很大。所以如果不是非常需要此功能，建议将 “Write JSON” 这一功能**关闭**。
+
+<br>
+
