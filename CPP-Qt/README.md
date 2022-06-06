@@ -14,7 +14,7 @@
 
 **Start Detection**: 
 
-<div align="center"><img src="D:\Github\YOLOv4_RemoteDetection_OpenCVDNN\CPP-Qt\README.assets\Detection.png" alt="Detection" width="700px" /></div>
+<div align="center"><img src="https://github.com/marc0cheung/YOLOv4_Detection_dnnOpenCV/raw/main/CPP-Qt/README.assets/Detection.png" alt="Detection" width="700px" /></div>
 
 ## Introduction
 
