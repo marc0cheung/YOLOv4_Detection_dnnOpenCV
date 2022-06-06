@@ -3,9 +3,17 @@
 
 <br>
 
-## C++ & Qt 版本检测程序主界面
+## C++ & Qt 版本检测程序界面
+
+**程序启动主界面：**
 
 <div align="center"><img src="https://github.com/marc0cheung/YOLOv4_Detection_dnnOpenCV/raw/main/CPP-Qt/README.assets/mainpage.png" alt="mainpage" width="500px" /></div>
+
+
+
+**目标检测界面：**
+
+<div align="center"><img src="D:\Github\YOLOv4_RemoteDetection_OpenCVDNN\CPP-Qt\README.assets\Detection.png" alt="Detection" width="700px" /></div>
 
 ## 简介
 
@@ -36,13 +44,29 @@ cuDNN: `cudnn-10.1-windows10-x64-v8.0.5.39.zip`
 注意：该配置方法仅适用于与本人使用同一 CUDA 和 cuDNN 版本的情况。
 <br>
 
+- 下载本项目的源代码。
 - 下载本人编译好的 `x64_dnn.zip` 压缩包
 - 解压到你的 `opencv\build\` 下。
 - 参考 【从零开始配置环境（GPU）】的 Step 4，在系统环境变量中添加 `D:\opencv\build\x64_dnn\vc16\bin` 
 - 在 VS2019 中参考 【从零开始配置环境（GPU）】的 Step 4，配置 VS2019 开发环境。
-<br><br>
+- 在 VS2019 中配置好 Qt 环境，在 "拓展" - "Qt VS Tools" - "Qt Versions" 中选择恰当的 Qt 版本。如果此处没有任何内容，需自己将所使用的 IDE 对应安装路径中的 `qmake.exe` 添加进去，例如 `D:\Qt\5.15.0\msvc2019_64\bin\qmake.exe` ，路径选择好后，Qt VS Tools 会自动添加 Qt 版本。
+- 打开项目属性，确定配置为 Release ，平台为 x64 ，打开 "Qt Project Settings" ，其中的 `Qt Installation` 需要设置为对应 Qt 版本、对应平台的选项。
+
+<br>
+
+<br>
+
 ## 从零开始配置环境（GPU）
+### Step 0: 安装 Qt 5.15.x
+
+- 前往 [Qt 中文官网](https://www.qt.io/zh-cn/) 下载并安装 Qt 版本，并按照其它教程将 Qt 配置到系统环境变量中，同时配置 Qt 到 VS2019 中。
+
+<br>
+
+<br>
+
 ### Step 1: 安装 CUDA
+
  - 确定本机安装了一张支持 CUDA 的 nVIDIA 显卡
  - 桌面上单击右键，选择 `NVIDIA控制面板` ，在菜单栏的 `帮助` > `系统信息` > `组件` 中找到 `NVCUDA.DLL`，即可看到支持的CUDA版本。
  - 前往 CUDA 官网 下载 CUDA Toolkit，可以在 [Archive of Previous CUDA Releases](https://developer.nvidia.com/cuda-toolkit-archive) 找到自己对应的版本。注意下载的版本不要超过 系统信息 中所显示的 `NVCUDA.DLL` 对应的版本。

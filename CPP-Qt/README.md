@@ -6,7 +6,15 @@
 
 ## C++ & Qt version detector UI
 
+**Programme Startup Mainpage: **
+
 <div align="center"><img src="https://github.com/marc0cheung/YOLOv4_Detection_dnnOpenCV/raw/main/CPP-Qt/README.assets/mainpage.png" alt="mainpage" width="500px" /></div>
+
+
+
+**Start Detection**: 
+
+<div align="center"><img src="D:\Github\YOLOv4_RemoteDetection_OpenCVDNN\CPP-Qt\README.assets\Detection.png" alt="Detection" width="700px" /></div>
 
 ## Introduction
 
@@ -42,16 +50,27 @@ Note: This configuration method only works if you are using the same CUDA and cu
 
 <br>
 
+- Download the Source Code of this Repo. 
 - Download my compiled `x64_dnn.zip` zip file
 - Extract it to your `opencv\build\` path
 - Add `D:\opencv\build\x64_dnn\vc16\bin` to your system environment variables as described in __Step 4__ of **[Configuring the Environment from Scratch (GPU) ]**
 - Refer to __Step 4__ of **[Configuring the Environment from Scratch (GPU) ]** to configure the VS2019 development environment.
+- Configure your Qt environment in VS2019 and select the appropriate version of Qt in "Extensions" - "Qt VS Tools" - "Qt Versions". If there is nothing here, you will need to add `qmake.exe` to the installation path of the IDE you are using, e.g. `D:\Qt\5.15.0\msvc2019_64\bin\qmake.exe`, and Qt VS Tools will automatically add the Qt version once the path has been selected.
+- Open the project properties setting window, make sure the configuration is `Release` and the platform is `x64`, open "Qt Project Settings" where `Qt Installation` needs to be set to the option corresponding to the Qt version and the corresponding platform.
 
 <br>
 
 <br>
 
 ## Configuring the Environment from Scratch (GPU)
+
+### Step 0: Install Qt 5.15.x
+
+- Go to [Qt Official Webpage](https://www.qt.io/) Download and install Qt 5.15.x, follow other tutorials to configure Qt into the system environment variables `Path`  and to configure Qt into VS2019.
+
+<br>
+
+<br>
 
 ### Step 1: Install CUDA
 
