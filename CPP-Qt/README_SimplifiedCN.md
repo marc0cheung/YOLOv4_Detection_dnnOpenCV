@@ -3,7 +3,9 @@
 
 <br>
 
-<br>
+## C++ & Qt 版本检测程序主界面
+
+<div align="center"><img src="D:\Github\YOLOv4_RemoteDetection_OpenCVDNN\CPP-Qt\README.assets\mainpage.png" alt="mainpage" width="500px" /></div>
 
 ## 简介
 
@@ -112,11 +114,6 @@ yolo_net.setPreferableTarget(cv::dnn::DNN_TARGET_CUDA);
 
 - 尝试运行项目，若能成功允许则配置成功。
 - 打开 `Windows任务管理器` ，查看项目运行时， CPU 与 GPU 的占用率，一般而言，在 CPU 为 `i7-4790` ， GPU 为 `GT 1030` 的工控电脑上， CPU 占用率基本上维持在 10% 以下。
-  <br><br>
-
-## 如何切换到 CPU 模式
-
-- 运行程序，将右下角的 “Use GPU + CUDA” 的勾选框设置为 “关闭” 状态。
 
 <br>
 
@@ -128,6 +125,51 @@ yolo_net.setPreferableTarget(cv::dnn::DNN_TARGET_CUDA);
 - 支持 Socket 协议通信，在不同平台、不同应用程序之间传递坐标信息。
 - 支持目标物坐标以 `.json` 格式输出
 - 坐标信息包含矩形框的四个点坐标，以及中心点坐标。
+
+<br>
+
+<br>
+
+## 一般程序使用方法
+
+- 打开程序后，程序左侧的 Text Broswer 会自动检索程序的默认配置并打印输出，如下图所示。**检查并调整这些设置以确保其符合使用要求。**
+  - **注意**：用于控制 Socket 通信是否打开的 `Open Socket` 开关 以及 用于控制 CPU / GPU 运算模式的 `Use GPU + CUDA` 开关需要在用户按下 "Start" 键开始检测之前设置好。在检测过程中所做的更改是无效的。
+  - **红色的开关 / 设置选项需要用户在运行前进行仔细检查。**
+
+<div align="center"><img src="D:\Github\YOLOv4_RemoteDetection_OpenCVDNN\CPP-Qt\README.assets\PreSetOutput.png" alt="PreSetOutput" style="zoom:80%;" /></div>
+
+- **程序按键、开关所对应的功能设定：**
+  - `Start ` : 开始调用 YOLOv4 网络进行目标检测。
+  - `Pause` : 程序暂停运行。
+  - `Exit` : 退出程序。
+  - `Clear` : 清除左侧 Text Browser 中输出的所有内容。
+  - **JSON**
+    - `Write JSON` : 打开 JSON 写入功能。
+    - `Log JSON` : 写入 JSON 过程中，程序会在 Text Browser 中输出 JSON 的内容。
+  - **Socket**
+    - `Open Socket` : 打开程序的 Socket 通信功能，对坐标以 Socket 协议进行发送。
+    - `Log Socket Message` : 对坐标以 Socket 协议进行发送的过程中，程序会在 Text Browser 中输出 Socket 服务端发出的内容。
+    - `Socket Server Address` : Socket 协议中的服务器端口和地址设定。
+    - `Save Address` : 在修改完 Socket 服务器地址和端口设置后，按下此按钮来使设置生效。
+  - **OpenCV UI Settings**
+    - `Open Video Stream` : 打开视频流预览。
+    - `Video Flip` : 180度反转视频图像（适用于摄像头反向安装的情况）。
+    - `Show Box.X` : 视频流预览窗口中展示从左往右数第一个目标物体的 x 轴坐标，用于观察 YOLOv4 网络识别的平顺度。
+    - `Show RunTime` : 视频流预览窗口中显示本检测程序的运行时间。
+    - `Video Stream Size` : 视频流预览窗口的分辨率大小，支持在运行过程中实时调整设置。设置完毕后，按下 `Save Video Size` 按钮来令设置生效。
+  - **YOLO Network**
+    - `Use GPU + CUDA` : 在配置好 CUDA 与 cuDNN 以及 OpenCV with CUDA 环境的计算机上，令 OpenCV 的 dnn 模块使用 GPU 代替 CPU 进行推理计算，减小 CPU 占用率。
+    - `cfgFile` : 不使用默认路径（`.\network\1.cfg`）的网络，传入自定义网络的 `.cfg` 文件。
+    - `weightsFile` : 不使用默认路径（`.\network\1.weights`）的网络，传入自定义网络的 `.weights` 文件。
+    - `namesFile` : 不使用默认路径（`.\network\1.names`）的网络，传入自定义网络的 `.names` 文件。
+
+<br>
+
+<br>
+
+## 如何切换到 CPU 计算模式
+
+- 运行程序，将右下角的 “Use GPU + CUDA” 的勾选框设置为 “关闭” 状态。
 
 <br>
 

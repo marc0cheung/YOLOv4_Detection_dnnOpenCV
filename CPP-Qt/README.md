@@ -4,7 +4,9 @@
 
 <br>
 
-<br>
+## C++ & Qt version detector UI
+
+<div align="center"><img src="D:\Github\YOLOv4_RemoteDetection_OpenCVDNN\CPP-Qt\README.assets\mainpage.png" alt="mainpage" width="500px" /></div>
 
 ## Introduction
 
@@ -145,6 +147,43 @@ yolo_net.setPreferableTarget(cv::dnn::DNN_TARGET_CUDA);
 - Open `Windows Task Manager` and check the CPU and GPU usage while the project is running. In general, on an IPC with an `i7-4790` CPU and `GT 1030` GPU, the CPU usage is basically below 10%.
 
 <br><br>
+
+## General User Guide
+
+- When you open the program, Text Broswer on the left hand side of the program will automatically retrieve the default configuration of the program and print the output as shown below. **Check and adjust these settings to ensure they are appropriate for use. **
+  - **Note**: The `Open Socket` switch, which controls whether socket communication is open, and the `Use GPU + CUDA` switch, which controls the CPU / GPU computing mode, need to be set before the user presses the "Start" key to start the detection. Changes of these 2 switches made during the detection process are not valid.
+  - **Switch / Setup options in red font require careful checking by the user before running. **
+
+<div align="center"><img src="D:\Github\YOLOv4_RemoteDetection_OpenCVDNN\CPP-Qt\README.assets\PreSetOutput.png" alt="PreSetOutput" style="zoom:80%;" /></div>
+
+- **Function setting corresponding to programme keys and switches:**
+  - `Start ` : Start Object Detection with YOLOv4 network. 
+  - `Pause` : Pause the programme.
+  - `Exit` : Exit the programme. 
+  - `Clear` : Clear all the contents in the Text Browser. 
+  - **JSON**
+    - `Write JSON` : if this check box is ticked, the programme will write all the coordinates of all the objects detected in the process to a `.json` file. 
+    - `Log JSON` : As the program writes coordinates to JSON file, it will also outputs the JSON content in the Text Browser, if this check box is ticked. 
+  - **Socket**
+    - `Open Socket` : Turn on the socket communication function of the program and send the coordinates by socket protocol.
+    - `Log Socket Message` : During the sending of coordinates by socket protocol, the program outputs the contents of what the socket server sends in the Text Browser.
+    - `Socket Server Address` : Server port and address settings in the Socket Protocol.
+    - `Save Address` : After modifying the socket server address and port settings, press this button to make the settings take effect.
+  - **OpenCV UI Settings**
+    - `Open Video Stream` : Open the video stream to preview the real-time detection effect.
+    - `Video Flip` : 180 degree reversal of the video frame (for cases where the camera is mounted in reverse).
+    - `Show Box.X` : Show the x-axis coordinates of the first target object, counted from left to right in the video stream preview window to see how smoothly the YOLOv4 network recognises it.
+    - `Show RunTime` : Display the runtime of this detection program in the video stream preview window.
+    - `Video Stream Size` : The resolution size of the video stream preview window can be adjusted in real time during runtime. Once set, press the `Save Video Size` button to make the settings take effect.
+  - **YOLO Network**
+    - `Use GPU + CUDA` : On a computer configured with *CUDA* and *cuDNN* and *OpenCV with CUDA* environments, the OpenCV dnn module uses the GPU instead of the CPU for inference calculations to reduce CPU usage.
+    - `cfgFile` : Instead of using the default path (`. \network\1.cfg`) for the network, users can pass in the `.cfg` file for their custom network.
+    - `weightsFile` : Instead of using the default path (`. \network\1.weights`) for the network, users can pass in the `.weights` file for their custom network.
+    - `namesFile` : Instead of using the default path (`. \network\1.names`) for the network, users can pass in the `.names` file for their custom network.
+
+<br>
+
+<br>
 
 ## How To Switch to CPU Computing Mode
 
