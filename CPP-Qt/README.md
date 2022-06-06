@@ -6,7 +6,7 @@
 
 ## C++ & Qt version detector UI
 
-<div align="center"><img src="D:\Github\YOLOv4_RemoteDetection_OpenCVDNN\CPP-Qt\README.assets\mainpage.png" alt="mainpage" width="500px" /></div>
+<div align="center"><img src="https://github.com/marc0cheung/YOLOv4_Detection_dnnOpenCV/raw/main/CPP-Qt/README.assets/mainpage.png" alt="mainpage" width="500px" /></div>
 
 ## Introduction
 
@@ -154,7 +154,7 @@ yolo_net.setPreferableTarget(cv::dnn::DNN_TARGET_CUDA);
   - **Note**: The `Open Socket` switch, which controls whether socket communication is open, and the `Use GPU + CUDA` switch, which controls the CPU / GPU computing mode, need to be set before the user presses the "Start" key to start the detection. Changes of these 2 switches made during the detection process are not valid.
   - **Switch / Setup options in red font require careful checking by the user before running. **
 
-<div align="center"><img src="D:\Github\YOLOv4_RemoteDetection_OpenCVDNN\CPP-Qt\README.assets\PreSetOutput.png" alt="PreSetOutput" style="zoom:80%;" /></div>
+<div align="center"><img src="https://github.com/marc0cheung/YOLOv4_Detection_dnnOpenCV/raw/main/CPP-Qt/README.assets/PreSetOutput.png" alt="PreSetOutput" style="zoom:80%;" /></div>
 
 - **Function setting corresponding to programme keys and switches:**
   - `Start ` : Start Object Detection with YOLOv4 network. 

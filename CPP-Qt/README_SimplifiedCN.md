@@ -5,7 +5,7 @@
 
 ## C++ & Qt 版本检测程序主界面
 
-<div align="center"><img src="D:\Github\YOLOv4_RemoteDetection_OpenCVDNN\CPP-Qt\README.assets\mainpage.png" alt="mainpage" width="500px" /></div>
+<div align="center"><img src="https://github.com/marc0cheung/YOLOv4_Detection_dnnOpenCV/raw/main/CPP-Qt/README.assets/mainpage.png" alt="mainpage" width="500px" /></div>
 
 ## 简介
 
@@ -136,7 +136,7 @@ yolo_net.setPreferableTarget(cv::dnn::DNN_TARGET_CUDA);
   - **注意**：用于控制 Socket 通信是否打开的 `Open Socket` 开关 以及 用于控制 CPU / GPU 运算模式的 `Use GPU + CUDA` 开关需要在用户按下 "Start" 键开始检测之前设置好。在检测过程中所做的更改是无效的。
   - **红色的开关 / 设置选项需要用户在运行前进行仔细检查。**
 
-<div align="center"><img src="D:\Github\YOLOv4_RemoteDetection_OpenCVDNN\CPP-Qt\README.assets\PreSetOutput.png" alt="PreSetOutput" style="zoom:80%;" /></div>
+<div align="center"><img src="https://github.com/marc0cheung/YOLOv4_Detection_dnnOpenCV/raw/main/CPP-Qt/README.assets/PreSetOutput.png" style="zoom:80%;" /></div>
 
 - **程序按键、开关所对应的功能设定：**
   - `Start ` : 开始调用 YOLOv4 网络进行目标检测。
