@@ -36,8 +36,9 @@ cuDNN: `cudnn-10.1-windows10-x64-v8.0.5.39.zip`
 
 - If you want to use the CPU for computing, you don't need to configure any environment, just run this programme out of the box.
 - If you wish to use the GPU for acceleration of the OpenCV dnn module.
-  - If you are using my pre-compiled program, you do not need to configure any environment other than the **exact same** NVIDIA CUDA + cuDNN environment that I mentioned above. But even so, I can't guarantee that this program will run properly in the same CUDA and cuDNN environment. If necessary, please configure the Nvidia and OpenCV environments from scratch and recompile the program to ensure that it runs on the GPU. Otherwise, the program will automatically switch to CPU mode.
-  - If you are not using my pre-compiled program, then you will need to configure the Nvidia and OpenCV environment from scratch and recompile the program to ensure that it runs on the GPU.
+  - If you are using my pre-compiled program, you do not need to configure any environment if you use **exact same** NVIDIA CUDA + cuDNN environment that I mentioned above. But even so, I **CANNOT** guarantee that this program will run properly in the same CUDA and cuDNN environment. If necessary, please configure the Nvidia and OpenCV environments from scratch and recompile the program to ensure that it runs on the GPU. Otherwise, the program will automatically switch to CPU Computing mode.
+  - If you are not using my pre-compiled program / OpenCV with CUDA and need to modify the code in Visual Studio, then you will need to configure the Nvidia and OpenCV environment from scratch properly and recompile the source code to ensure that it runs on the GPU.
+  - If you use a different version of CUDA and cuDNN, you need to configure the Nvidia and OpenCV environment from scratch properly and recompile the source code to ensure that it runs on the GPU. 
 
 <br>
 
