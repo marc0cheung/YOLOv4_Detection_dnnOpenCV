@@ -6,7 +6,7 @@
 
 ## C++ & Qt version detector UI
 
-**Programme Startup Mainpage: **
+**Programme Startup Mainpage:**
 
 <div align="center"><img src="https://github.com/marc0cheung/YOLOv4_Detection_dnnOpenCV/raw/main/CPP-Qt/README.assets/mainpage.png" alt="mainpage" width="500px" /></div>
 
