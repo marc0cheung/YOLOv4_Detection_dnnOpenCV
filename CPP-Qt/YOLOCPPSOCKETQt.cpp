@@ -53,9 +53,11 @@ int VideoSize_width = 960;
 int VideoSize_height = 540;
 // YOLO network Configuration
 int BackendGPU = 1;
-string cfgFile = "./network/1.cfg";
-string weightsFile = "./network/1.weights";
-string namesFile = "./network/1.names";
+float confThreshold = 0.9; // Confidence threshold
+float nmsThreshold = 0.4;  // Non-maximum suppression threshold
+string cfgFile = "./network/2.cfg";
+string weightsFile = "./network/2.weights";
+string namesFile = "./network/2.names";
 
 
 // Initialize Json
@@ -68,7 +70,7 @@ YOLOCPPSOCKETQt::YOLOCPPSOCKETQt(QWidget *parent)
 {
     ui.setupUi(this);
 
-	ui.output->append(" [!!!!!] Config [Open Socket] and [Use GPU + CUDA] and [YOLO Network Files] First!");
+	ui.output->append(" [!!!!!] Config [Open Socket] and [Use GPU + CUDA] and [YOLO Network Files] and [Threshold] First!");
 	ui.output->append(" [!!!!!] All Pre-Start Settings Needed to be CONFIRM / set are colored in Red.");
 	ui.output->append(" [!!!!!] Please Check Below Startup Configuration Carefully!\n");
 
@@ -81,6 +83,8 @@ YOLOCPPSOCKETQt::YOLOCPPSOCKETQt(QWidget *parent)
 	ui.openSocketCheckBox->setPalette(red);
 	ui.useGPUCheckBox->setPalette(red);
 	ui.yoloNetworkLabel->setPalette(red);
+	ui.confThreshold_label->setPalette(red);
+	ui.NMSThreshold_label->setPalette(red);
 
 	// PushButtons Signal and Slots
     connect(ui.startBtn, SIGNAL(clicked()), this, SLOT(on_StartBtn_Clicked()));
@@ -90,6 +94,7 @@ YOLOCPPSOCKETQt::YOLOCPPSOCKETQt(QWidget *parent)
 
 	connect(ui.saveAddrBtn, SIGNAL(clicked()), this, SLOT(on_saveAddrBtn_Clicked()));
 	connect(ui.saveVideoSizeBtn, SIGNAL(clicked()), this, SLOT(on_saveVideoSizeBtn_Clicked()));
+	connect(ui.saveThresholdBtn, SIGNAL(clicked()), this, SLOT(on_saveThresholdBtn_Clicked()));
 
 	connect(ui.cfgFileBtn, SIGNAL(clicked()), this, SLOT(on_cfgFileBtn_Clicked()));
 	connect(ui.weightsFileBtn, SIGNAL(clicked()), this, SLOT(on_weightsFileBtn_Clicked()));
@@ -176,6 +181,14 @@ void YOLOCPPSOCKETQt::showStartupConfig()
 	names_file_path.append(namesFile);
 	ui.output->append(QString::fromStdString(names_file_path));
 
+	string conf_str = "[15] Confident Threshold: ";
+	conf_str.append(to_string(confThreshold));
+	ui.output->append(QString::fromStdString(conf_str));
+
+	string nms_str = "[16] NMS Threshold: ";
+	nms_str.append(to_string(nmsThreshold));
+	ui.output->append(QString::fromStdString(nms_str));
+
 	ui.output->append("=============================================");
 	ui.output->append("");
 
@@ -229,8 +242,8 @@ int YOLOCPPSOCKETQt::on_StartBtn_Clicked()
 		classes.push_back(line);
 
 	// Set net argvs
-	float confThreshold = 0.9; // Confidence threshold
-	float nmsThreshold = 0.4;  // Non-maximum suppression threshold
+	//float confThreshold = 0.9; // Confidence threshold
+	//float nmsThreshold = 0.4;  // Non-maximum suppression threshold
 	int inpWidth = 416;        // Width of network's input image
 	int inpHeight = 416;       // Height of network's input image
 
@@ -537,6 +550,17 @@ void YOLOCPPSOCKETQt::on_saveVideoSizeBtn_Clicked()
 
 	string msg = "VideoSize is set to: " + to_string(VideoSize_width) + " x " + to_string(VideoSize_height);
 	ui.output->append(QString::fromStdString(msg));
+}
+
+void YOLOCPPSOCKETQt::on_saveThresholdBtn_Clicked()
+{
+	confThreshold = stof((ui.confThreshold_Input->toPlainText()).toStdString());
+	nmsThreshold = stof((ui.NMSInput->toPlainText()).toStdString());
+
+	string msg_conf = "confThreshold is set to: " + to_string(confThreshold);
+	string msg_nms = "NMSThreshold is set to: " + to_string(nmsThreshold);
+	ui.output->append(QString::fromStdString(msg_conf));
+	ui.output->append(QString::fromStdString(msg_nms));
 }
 
 void YOLOCPPSOCKETQt::on_cfgFileBtn_Clicked()

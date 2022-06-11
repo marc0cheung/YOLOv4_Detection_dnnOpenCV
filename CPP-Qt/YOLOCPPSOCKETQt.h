@@ -19,6 +19,7 @@ public slots:
 
     void on_saveAddrBtn_Clicked();
     void on_saveVideoSizeBtn_Clicked();
+    void on_saveThresholdBtn_Clicked();
 
     void on_cfgFileBtn_Clicked();
     void on_weightsFileBtn_Clicked();
