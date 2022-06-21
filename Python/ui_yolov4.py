@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 ################################################################################
-## Form generated from reading UI file 'yolov4_live_detectorifpxRq.ui'
+## Form generated from reading UI file 'yolov4_live_detectorEByCbj.ui'
 ##
 ## Created by: Qt User Interface Compiler version 5.15.2
 ##
@@ -77,7 +77,7 @@ class Ui_MainWindow(object):
         self.path_label.setFont(font)
         self.status_label = QLabel(self.centralwidget)
         self.status_label.setObjectName(u"status_label")
-        self.status_label.setGeometry(QRect(650, 30, 121, 391))
+        self.status_label.setGeometry(QRect(650, 30, 121, 311))
         self.status_label.setFont(font2)
         self.status_label.setAlignment(Qt.AlignCenter)
         self.fromFileBtn = QPushButton(self.centralwidget)
@@ -200,6 +200,18 @@ class Ui_MainWindow(object):
         self.weightsFile_Label.setObjectName(u"weightsFile_Label")
         self.weightsFile_Label.setGeometry(QRect(10, 700, 301, 20))
         self.weightsFile_Label.setFont(font)
+        self.confValue_checkbox = QCheckBox(self.centralwidget)
+        self.confValue_checkbox.setObjectName(u"confValue_checkbox")
+        self.confValue_checkbox.setGeometry(QRect(660, 390, 111, 19))
+        self.confValue_checkbox.setChecked(True)
+        self.showBBox_checkbox = QCheckBox(self.centralwidget)
+        self.showBBox_checkbox.setObjectName(u"showBBox_checkbox")
+        self.showBBox_checkbox.setGeometry(QRect(660, 420, 111, 19))
+        self.showBBox_checkbox.setChecked(True)
+        self.showNames_checkbox = QCheckBox(self.centralwidget)
+        self.showNames_checkbox.setObjectName(u"showNames_checkbox")
+        self.showNames_checkbox.setGeometry(QRect(660, 360, 121, 19))
+        self.showNames_checkbox.setChecked(True)
         MainWindow.setCentralWidget(self.centralwidget)
 
         self.retranslateUi(MainWindow)
@@ -281,5 +293,8 @@ class Ui_MainWindow(object):
         self.cfgFile_Label.setText(QCoreApplication.translate("MainWindow", u".cfg File: network/1.cfg", None))
         self.namesFile_Label.setText(QCoreApplication.translate("MainWindow", u".names File: network/1.names", None))
         self.weightsFile_Label.setText(QCoreApplication.translate("MainWindow", u".weights File: network/1.weights", None))
+        self.confValue_checkbox.setText(QCoreApplication.translate("MainWindow", u"Conf Value", None))
+        self.showBBox_checkbox.setText(QCoreApplication.translate("MainWindow", u"Show BBox", None))
+        self.showNames_checkbox.setText(QCoreApplication.translate("MainWindow", u"Object Names", None))
     # retranslateUi
 

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 ################################################################################
-## Form generated from reading UI file 'fromFileDialogfTBBLN.ui'
+## Form generated from reading UI file 'fromFileDialogMCuaKp.ui'
 ##
 ## Created by: Qt User Interface Compiler version 5.15.2
 ##
@@ -17,7 +17,7 @@ class Ui_Dialog(object):
     def setupUi(self, Dialog):
         if not Dialog.objectName():
             Dialog.setObjectName(u"Dialog")
-        Dialog.resize(1003, 701)
+        Dialog.resize(1002, 701)
         self.original_image = QLabel(Dialog)
         self.original_image.setObjectName(u"original_image")
         self.original_image.setGeometry(QRect(60, 150, 416, 416))
@@ -67,7 +67,7 @@ class Ui_Dialog(object):
         self.cfgFileBtn = QPushButton(Dialog)
         self.cfgFileBtn.setObjectName(u"cfgFileBtn")
         self.cfgFileBtn.setEnabled(False)
-        self.cfgFileBtn.setGeometry(QRect(540, 30, 121, 28))
+        self.cfgFileBtn.setGeometry(QRect(500, 30, 121, 28))
         self.cfgFilePath_Label = QLabel(Dialog)
         self.cfgFilePath_Label.setObjectName(u"cfgFilePath_Label")
         self.cfgFilePath_Label.setGeometry(QRect(70, 30, 301, 20))
@@ -75,7 +75,7 @@ class Ui_Dialog(object):
         self.namesFileBtn = QPushButton(Dialog)
         self.namesFileBtn.setObjectName(u"namesFileBtn")
         self.namesFileBtn.setEnabled(False)
-        self.namesFileBtn.setGeometry(QRect(540, 70, 121, 28))
+        self.namesFileBtn.setGeometry(QRect(500, 70, 121, 28))
         self.namesFilePath_Label = QLabel(Dialog)
         self.namesFilePath_Label.setObjectName(u"namesFilePath_Label")
         self.namesFilePath_Label.setGeometry(QRect(70, 70, 301, 20))
@@ -87,22 +87,32 @@ class Ui_Dialog(object):
         self.weightsFileBtn = QPushButton(Dialog)
         self.weightsFileBtn.setObjectName(u"weightsFileBtn")
         self.weightsFileBtn.setEnabled(False)
-        self.weightsFileBtn.setGeometry(QRect(540, 110, 121, 28))
+        self.weightsFileBtn.setGeometry(QRect(500, 110, 121, 28))
         self.saveThresholdBtn = QPushButton(Dialog)
         self.saveThresholdBtn.setObjectName(u"saveThresholdBtn")
-        self.saveThresholdBtn.setGeometry(QRect(730, 110, 181, 28))
+        self.saveThresholdBtn.setGeometry(QRect(650, 110, 181, 28))
         self.confThreshold_label = QLabel(Dialog)
         self.confThreshold_label.setObjectName(u"confThreshold_label")
-        self.confThreshold_label.setGeometry(QRect(730, 10, 181, 16))
+        self.confThreshold_label.setGeometry(QRect(650, 10, 181, 16))
         self.NMSInput = QTextEdit(Dialog)
         self.NMSInput.setObjectName(u"NMSInput")
-        self.NMSInput.setGeometry(QRect(850, 60, 61, 41))
+        self.NMSInput.setGeometry(QRect(770, 60, 61, 41))
         self.confThreshold_Input = QTextEdit(Dialog)
         self.confThreshold_Input.setObjectName(u"confThreshold_Input")
-        self.confThreshold_Input.setGeometry(QRect(850, 10, 61, 41))
+        self.confThreshold_Input.setGeometry(QRect(770, 10, 61, 41))
         self.NMSThreshold_label = QLabel(Dialog)
         self.NMSThreshold_label.setObjectName(u"NMSThreshold_label")
-        self.NMSThreshold_label.setGeometry(QRect(730, 60, 181, 16))
+        self.NMSThreshold_label.setGeometry(QRect(650, 60, 181, 16))
+        self.showNames_checkbox = QCheckBox(Dialog)
+        self.showNames_checkbox.setObjectName(u"showNames_checkbox")
+        self.showNames_checkbox.setGeometry(QRect(860, 30, 121, 19))
+        self.showBBox_checkbox = QCheckBox(Dialog)
+        self.showBBox_checkbox.setObjectName(u"showBBox_checkbox")
+        self.showBBox_checkbox.setGeometry(QRect(860, 90, 111, 19))
+        self.showBBox_checkbox.setChecked(True)
+        self.confValue_checkbox = QCheckBox(Dialog)
+        self.confValue_checkbox.setObjectName(u"confValue_checkbox")
+        self.confValue_checkbox.setGeometry(QRect(860, 60, 111, 19))
 
         self.retranslateUi(Dialog)
 
@@ -140,5 +150,8 @@ class Ui_Dialog(object):
 "</style></head><body style=\" font-family:'SimSun'; font-size:9pt; font-weight:400; font-style:normal;\">\n"
 "<p align=\"center\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:12pt;\">0.9</span></p></body></html>", None))
         self.NMSThreshold_label.setText(QCoreApplication.translate("Dialog", u"NMS Threshold:", None))
+        self.showNames_checkbox.setText(QCoreApplication.translate("Dialog", u"Object Names", None))
+        self.showBBox_checkbox.setText(QCoreApplication.translate("Dialog", u"Show BBox", None))
+        self.confValue_checkbox.setText(QCoreApplication.translate("Dialog", u"Conf Value", None))
     # retranslateUi
 

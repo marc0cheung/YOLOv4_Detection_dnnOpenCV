@@ -16,19 +16,17 @@ from ui_fromFileDialog import Ui_Dialog as fromFileUi_Dialog
 
 imgNum = 0
 FileDirectory = ''
-cfgDIR = 'network/1.cfg'
-namesDIR = 'network/1.names'
-weightsDIR = 'network/1.weights'
+cfgDIR = 'networkButton/1.cfg'
+namesDIR = 'networkButton/1.names'
+weightsDIR = 'networkButton/1.weights'
 img_width = 416
 img_height = 416
 
 
-def drawbbx(img, x, y, w, h, predName, score):
-    colorline = (0, 255, 0)  # 角点线段颜色
-    angerline = 13  # 角点线段长度
-    # 检测框
+def drawbbx(img, x, y, w, h, predName, score, showNames, showConf):
+    colorline = (0, 255, 0)
+    angerline = 13
     cv2.rectangle(img, (x, y), (x + w, y + h), (255, 255, 0), 1)
-    # 角点美化
     cv2.line(img, (x, y), (x + angerline, y), colorline, 2)
     cv2.line(img, (x, y), (x, y + angerline), colorline, 2)
     cv2.line(img, (x + w, y), (x + w, y + angerline), colorline, 2)
@@ -38,11 +36,11 @@ def drawbbx(img, x, y, w, h, predName, score):
     cv2.line(img, (x + w, y + h), (x + w, y + h - angerline), colorline, 2)
     cv2.line(img, (x + w, y + h), (x + w - angerline, y + h), colorline, 2)
 
-    # 显示预测的类别
-    cv2.putText(img, predName, (x, y + h + 20), cv2.FONT_HERSHEY_COMPLEX, 1, (0, 255, 0), 2)
+    if showNames:
+        cv2.putText(img, predName, (x, y + h + 20), cv2.FONT_HERSHEY_COMPLEX, 1, (0, 255, 0), 2)
 
-    # 显示预测概率
-    cv2.putText(img, str(int(score * 100)) + '%', (x, y - 5), cv2.FONT_HERSHEY_COMPLEX, 1, (0, 255, 255), 2)
+    if showConf:
+        cv2.putText(img, str(int(score * 100)) + '%', (x, y - 5), cv2.FONT_HERSHEY_COMPLEX, 1, (0, 255, 255), 2)
 
 
 class StartUpPage(QDialog):
@@ -77,6 +75,9 @@ class MainWindow(QMainWindow):
     video_stream = True
     show_message = False
     show_runtime = True
+    showDetectedNames = True
+    showDetectedConf = True
+    showBBox = True
     confThreshold = 0.9
     NMSThreshold = 0.4
     segment_path = ''
@@ -101,7 +102,7 @@ class MainWindow(QMainWindow):
         self.ui.GetObjSegmentBtn.clicked.connect(self.segment)
         self.ui.SelcPathBtn.clicked.connect(self.chooseDir)
         self.ui.SelcPathBtn_segment.clicked.connect(self.chooseSegmentDir)
-        self.ui.AboutBtn.clicked.connect(self.say_hello)  # 多文件的情况在这里就可以进行函数链接
+        self.ui.AboutBtn.clicked.connect(self.say_hello)
         self.ui.saveThresholdBtn.clicked.connect(self.onSaveThresholdClicked)
 
         # CheckBox Signals and Slots
@@ -109,6 +110,9 @@ class MainWindow(QMainWindow):
         self.ui.videoStreamCheckBox.stateChanged.connect(self.onVideoStreamCheckBox_Changed)
         self.ui.MessageCheckBox.stateChanged.connect(self.onMessageCheckBox_Changed)
         self.ui.runtimeCheckBox.stateChanged.connect(self.onRunTimeCheckBox_Changed)
+        self.ui.showNames_checkbox.stateChanged.connect(self.onShowNamesCheckBox_Changed)
+        self.ui.confValue_checkbox.stateChanged.connect(self.onConfValueCheckBox_Changed)
+        self.ui.showBBox_checkbox.stateChanged.connect(self.onShowBBoxCheckBox_Changed)
 
     def setup_camera(self, fps):
         self.camera_capture.set(3, self.video_size.width())
@@ -131,15 +135,15 @@ class MainWindow(QMainWindow):
         T1 = time.perf_counter()
         classids, scores, bboxes = model.detect(frame, self.confThreshold, self.NMSThreshold)
         for class_id, score, bbox in zip(classids, scores, bboxes):
-            # 获取检测框的左上角坐标和宽高
             x, y, w, h = bbox
 
-            # 获取检测框对应的分类名
+            # get names of classes
             class_name = classes[class_id]
 
-            drawbbx(frame, x, y, w, h, class_name, score)
+            if self.showBBox:
+                drawbbx(frame, x, y, w, h, class_name, score, self.showDetectedNames, self.showDetectedConf)
 
-        T2 = time.perf_counter()  # 检测完毕时间节点
+        T2 = time.perf_counter()
 
         if self.show_message:
             if self.show_runtime:
@@ -183,13 +187,12 @@ class MainWindow(QMainWindow):
             segment_index = 1
             classids, scores, bboxes = model.detect(frame, 0.8, 0.3)
             for class_id, score, bbox in zip(classids, scores, bboxes):
-                # 获取检测框的左上角坐标和宽高
                 x, y, w, h = bbox
 
-                # 获取检测框对应的分类名
+                # get names of classes
                 class_name = classes[class_id]
 
-                drawbbx(frame, x, y, w, h, class_name, score)
+                drawbbx(frame, x, y, w, h, class_name, score, self.showDetectedNames, self.showDetectedConf)
                 cv2.imwrite(self.segment_path + '/segment_%s.png' % str(segment_index), frame[y: y + h, x: x + w])
                 segment_index = segment_index + 1
             # print(str(len(bboxes)) + " Object(s) Detected")
@@ -208,13 +211,12 @@ class MainWindow(QMainWindow):
 
             classids, scores, bboxes = model.detect(frame, 0.8, 0.3)
             for class_id, score, bbox in zip(classids, scores, bboxes):
-                # 获取检测框的左上角坐标和宽高
                 x, y, w, h = bbox
 
-                # 获取检测框对应的分类名
+                # get names of classes
                 class_name = classes[class_id]
 
-                drawbbx(frame, x, y, w, h, class_name, score)
+                drawbbx(frame, x, y, w, h, class_name, score, self.showDetectedNames, self.showDetectedConf)
 
             show = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
             showImage = QImage(show.data, show.shape[1], show.shape[0], QImage.Format_RGB888)
@@ -272,6 +274,24 @@ class MainWindow(QMainWindow):
         elif self.ui.runtimeCheckBox.checkState() == Qt.Unchecked:
             self.show_runtime = False
 
+    def onShowNamesCheckBox_Changed(self):
+        if self.ui.showNames_checkbox.checkState() == Qt.Checked:
+            self.showDetectedNames = True
+        elif self.ui.showNames_checkbox.checkState() == Qt.Unchecked:
+            self.showDetectedNames = False
+
+    def onConfValueCheckBox_Changed(self):
+        if self.ui.confValue_checkbox.checkState() == Qt.Checked:
+            self.showDetectedConf = True
+        elif self.ui.confValue_checkbox.checkState() == Qt.Unchecked:
+            self.showDetectedConf = False
+
+    def onShowBBoxCheckBox_Changed(self):
+        if self.ui.showBBox_checkbox.checkState() == Qt.Checked:
+            self.showBBox = True
+        elif self.ui.showBBox_checkbox.checkState() == Qt.Unchecked:
+            self.showBBox = False
+
     def say_hello(self):
         QMessageBox.information(self, 'About this software', 'Designed by Marco Cheung')
 
@@ -291,7 +311,9 @@ class fromFilePage(QDialog):
     namesFilePath = 'network/1.names'
     weightsFilePath = 'network/1.weights'
     detected_frame = None
-
+    showDetectedNames = False
+    showDetectedConf = False
+    showBBox = True
     fileDetect_net = None
 
     def __init__(self):
@@ -309,6 +331,10 @@ class fromFilePage(QDialog):
         self.fromFileUI.namesFileBtn.clicked.connect(self.selectNamesFile)
         self.fromFileUI.weightsFileBtn.clicked.connect(self.selectWeightsFile)
         self.fromFileUI.saveThresholdBtn.clicked.connect(self.setThreshold)
+
+        self.fromFileUI.showNames_checkbox.stateChanged.connect(self.onShowNamesCheckBox_Changed)
+        self.fromFileUI.confValue_checkbox.stateChanged.connect(self.onConfValueCheckBox_Changed)
+        self.fromFileUI.showBBox_checkbox.stateChanged.connect(self.onShowBBoxCheckBox_Changed)
 
     def setThreshold(self):
         self.confThreshold = float(self.fromFileUI.confThreshold_Input.toPlainText())
@@ -334,15 +360,18 @@ class fromFilePage(QDialog):
     def selectFilePath(self):
         self.source_path = QFileDialog.getOpenFileName(QDialog(), "Open Image Source File")
         # print("File DIR: " + str(source_image))
-        self.fromFileUI.file_path_label.setText("Source: " + str(self.source_path[0]))
-        frame = cv2.imread(self.source_path[0])
-        show = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-        showImage = QImage(show.data, show.shape[1], show.shape[0], QImage.Format_RGB888)
-        self.fromFileUI.original_image.setPixmap(QPixmap.fromImage(showImage))
+        if self.source_path[0] != '':
+            self.fromFileUI.file_path_label.setText("Source: " + str(self.source_path[0]))
+            frame = cv2.imread(self.source_path[0])
+            show = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+            showImage = QImage(show.data, show.shape[1], show.shape[0], QImage.Format_RGB888)
+            self.fromFileUI.original_image.setPixmap(QPixmap.fromImage(showImage))
 
     def selectSavingPath(self):
         self.save_path = QFileDialog.getExistingDirectory(QDialog(), "Choose Save Directory")
-        self.fromFileUI.savepath_label.setText(str(self.save_path))
+
+        if self.save_path != '':
+            self.fromFileUI.savepath_label.setText(str(self.save_path))
 
     def detectPhoto(self):
         if self.source_path == '':
@@ -353,13 +382,13 @@ class fromFilePage(QDialog):
 
             classids, scores, bboxes = model.detect(frame, self.confThreshold, self.NMSThreshold)
             for class_id, score, bbox in zip(classids, scores, bboxes):
-                # 获取检测框的左上角坐标和宽高
                 x, y, w, h = bbox
 
-                # 获取检测框对应的分类名
+                # get names of classes
                 class_name = classes[class_id]
 
-                drawbbx(frame, x, y, w, h, class_name, score)
+                if self.showBBox:
+                    drawbbx(frame, x, y, w, h, class_name, score, self.showDetectedNames, self.showDetectedConf)
 
             self.detected_frame = frame
             show = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
@@ -378,13 +407,12 @@ class fromFilePage(QDialog):
             segment_index = 1
             classids, scores, bboxes = model.detect(frame, self.confThreshold, self.NMSThreshold)
             for class_id, score, bbox in zip(classids, scores, bboxes):
-                # 获取检测框的左上角坐标和宽高
                 x, y, w, h = bbox
 
-                # 获取检测框对应的分类名
+                # get names of classes
                 class_name = classes[class_id]
 
-                drawbbx(frame, x, y, w, h, class_name, score)
+                drawbbx(frame, x, y, w, h, class_name, score, self.showDetectedNames, self.showDetectedConf)
                 cv2.imwrite(self.save_path + '/segment_%s.png' % str(segment_index), frame[y: y + h, x: x + w])
                 segment_index = segment_index + 1
             # print(str(len(bboxes)) + " Object(s) Detected")
@@ -396,6 +424,24 @@ class fromFilePage(QDialog):
         else:
             cv2.imwrite(self.save_path + '/cap_%s.png' % str("capIndex"), self.detected_frame)
             self.fromFileUI.notification.setText("Capture Saved!")
+
+    def onShowNamesCheckBox_Changed(self):
+        if self.fromFileUI.showNames_checkbox.checkState() == Qt.Checked:
+            self.showDetectedNames = True
+        elif self.fromFileUI.showNames_checkbox.checkState() == Qt.Unchecked:
+            self.showDetectedNames = False
+
+    def onConfValueCheckBox_Changed(self):
+        if self.fromFileUI.confValue_checkbox.checkState() == Qt.Checked:
+            self.showDetectedConf = True
+        elif self.fromFileUI.confValue_checkbox.checkState() == Qt.Unchecked:
+            self.showDetectedConf = False
+
+    def onShowBBoxCheckBox_Changed(self):
+        if self.fromFileUI.showBBox_checkbox.checkState() == Qt.Checked:
+            self.showBBox = True
+        elif self.fromFileUI.showBBox_checkbox.checkState() == Qt.Unchecked:
+            self.showBBox = False
 
 
 if __name__ == '__main__':
