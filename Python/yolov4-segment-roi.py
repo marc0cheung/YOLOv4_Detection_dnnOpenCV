@@ -16,9 +16,9 @@ from ui_fromFileDialog import Ui_Dialog as fromFileUi_Dialog
 
 imgNum = 0
 FileDirectory = ''
-cfgDIR = 'networkButton/1.cfg'
-namesDIR = 'networkButton/1.names'
-weightsDIR = 'networkButton/1.weights'
+cfgDIR = 'network/button-tiny.cfg'
+namesDIR = 'network/button-tiny.names'
+weightsDIR = 'network/button-tiny.weights'
 img_width = 416
 img_height = 416
 
@@ -192,7 +192,9 @@ class MainWindow(QMainWindow):
                 # get names of classes
                 class_name = classes[class_id]
 
-                drawbbx(frame, x, y, w, h, class_name, score, self.showDetectedNames, self.showDetectedConf)
+                if self.showBBox:
+                    drawbbx(frame, x, y, w, h, class_name, score, self.showDetectedNames, self.showDetectedConf)
+
                 cv2.imwrite(self.segment_path + '/segment_%s.png' % str(segment_index), frame[y: y + h, x: x + w])
                 segment_index = segment_index + 1
             # print(str(len(bboxes)) + " Object(s) Detected")
@@ -216,7 +218,8 @@ class MainWindow(QMainWindow):
                 # get names of classes
                 class_name = classes[class_id]
 
-                drawbbx(frame, x, y, w, h, class_name, score, self.showDetectedNames, self.showDetectedConf)
+                if self.showBBox:
+                    drawbbx(frame, x, y, w, h, class_name, score, self.showDetectedNames, self.showDetectedConf)
 
             show = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
             showImage = QImage(show.data, show.shape[1], show.shape[0], QImage.Format_RGB888)
@@ -412,7 +415,9 @@ class fromFilePage(QDialog):
                 # get names of classes
                 class_name = classes[class_id]
 
-                drawbbx(frame, x, y, w, h, class_name, score, self.showDetectedNames, self.showDetectedConf)
+                if self.showBBox:
+                    drawbbx(frame, x, y, w, h, class_name, score, self.showDetectedNames, self.showDetectedConf)
+
                 cv2.imwrite(self.save_path + '/segment_%s.png' % str(segment_index), frame[y: y + h, x: x + w])
                 segment_index = segment_index + 1
             # print(str(len(bboxes)) + " Object(s) Detected")
