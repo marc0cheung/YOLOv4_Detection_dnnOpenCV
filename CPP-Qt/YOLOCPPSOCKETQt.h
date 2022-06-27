@@ -34,6 +34,9 @@ public slots:
     void on_BoxXCheckBox_Changed(int state);
     void on_runtimeCheckBox_Changed(int state);
     void on_useGPUCheckBox_Changed(int state);
+    void on_BBoxCheckBox_Changed(int state);
+    void on_NameConfCheckBox_Changed(int state);
+    void on_ObjIndexCheckBox_Changed(int state);
 private:
     Ui::YOLOCPPSOCKETQtClass ui;
 };

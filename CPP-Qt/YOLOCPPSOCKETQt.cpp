@@ -46,6 +46,9 @@ int outputSocketMessage = 0;
 // Video Stream UI Configuration
 int DisplayBoxX = 0;
 int DisplayRunTime = 0;
+int ShowBBox = 1;
+int ShowObjNamesConf = 1;
+int ShowObjIndex = 1;
 // Video Configuration
 int VideoStream = 1;
 int VideoFlip = 1;
@@ -55,9 +58,9 @@ int VideoSize_height = 540;
 int BackendGPU = 1;
 float confThreshold = 0.9; // Confidence threshold
 float nmsThreshold = 0.4;  // Non-maximum suppression threshold
-string cfgFile = "./network/network_cfg_name.cfg";
-string weightsFile = "./network/network_weights_name.weights";
-string namesFile = "./network/object_names_file.names";
+string cfgFile = "./network/button.cfg";
+string weightsFile = "./network/button.weights";
+string namesFile = "./network/button.names";
 
 
 // Initialize Json
@@ -112,6 +115,10 @@ YOLOCPPSOCKETQt::YOLOCPPSOCKETQt(QWidget *parent)
 	connect(ui.videoFlipCheckBox, SIGNAL(stateChanged(int)), this, SLOT(on_videoFlipCheckBox_Changed(int)));
 	connect(ui.boxXCheckBox, SIGNAL(stateChanged(int)), this, SLOT(on_BoxXCheckBox_Changed(int)));
 	connect(ui.runtimeCheckBox, SIGNAL(stateChanged(int)), this, SLOT(on_runtimeCheckBox_Changed(int)));
+	connect(ui.BBoxCheckBox, SIGNAL(stateChanged(int)), this, SLOT(on_BBoxCheckBox_Changed(int)));
+	connect(ui.NameConfCheckBox, SIGNAL(stateChanged(int)), this, SLOT(on_NameConfCheckBox_Changed(int)));
+	connect(ui.ObjIndexCheckBox, SIGNAL(stateChanged(int)), this, SLOT(on_ObjIndexCheckBox_Changed(int)));
+
 
 	connect(ui.useGPUCheckBox, SIGNAL(stateChanged(int)), this, SLOT(on_useGPUCheckBox_Changed(int)));
 }
@@ -151,6 +158,21 @@ void YOLOCPPSOCKETQt::showStartupConfig()
 	else
 		ui.output->append("[7] Display RunTime: CLOSED");
 
+	if (ShowBBox == 1)
+		ui.output->append("[8] Show Bounding Box: OPEN");
+	else
+		ui.output->append("[8] Show Bounding Box: CLOSED");
+
+	if (ShowObjNamesConf == 1)
+		ui.output->append("[9] Show Object Names: OPEN");
+	else
+		ui.output->append("[9] Show Object Names: CLOSED");
+
+	if (ShowObjIndex == 1)
+		ui.output->append("[10] Show Conf Value: OPEN");
+	else
+		ui.output->append("[10] Show Conf Value: CLOSED");
+	
 	if (VideoStream == 1)
 		ui.output->append("[8] OpenCV Video Stream: OPEN");
 	else
@@ -356,7 +378,12 @@ int YOLOCPPSOCKETQt::on_StartBtn_Clicked()
 			{
 				int idx = indices[i];
 				Rect box = boxes[idx];
-				rectangle(frame, Point(box.x, box.y), Point(box.x + box.width, box.y + box.height), Scalar(0, 0, 255), 1);
+				
+				if (ShowBBox == 1)
+				{
+					rectangle(frame, Point(box.x, box.y), Point(box.x + box.width, box.y + box.height), Scalar(0, 0, 255), 1);
+				}
+				
 				string label = format("%.2f", confidences[idx]);
 				if (!classes.empty())
 				{
@@ -366,9 +393,18 @@ int YOLOCPPSOCKETQt::on_StartBtn_Clicked()
 				int baseLine;
 				Size labelSize = getTextSize(label, FONT_HERSHEY_SIMPLEX, 0.5, 1, &baseLine);
 				box.y = max(box.y, labelSize.height);
-				putText(frame, label, Point(box.x, box.y), FONT_HERSHEY_SIMPLEX, 0.75, Scalar(0, 255, 0), 1);
+				
+				if (ShowObjNamesConf == 1)
+				{
+					putText(frame, label, Point(box.x, box.y), FONT_HERSHEY_SIMPLEX, 0.75, Scalar(0, 255, 0), 1);
+				}
+
 				std::string i_str = std::to_string(i + 1);
-				putText(frame, i_str, Point(box.x + box.width, box.y), FONT_HERSHEY_SIMPLEX, 0.75, Scalar(0, 0, 255), 1);
+				
+				if (ShowObjIndex == 1)
+				{
+					putText(frame, i_str, Point(box.x + box.width, box.y), FONT_HERSHEY_SIMPLEX, 0.75, Scalar(0, 0, 255), 1);
+				}
 
 				if (DisplayBoxX == 1)
 				{
@@ -721,5 +757,47 @@ void YOLOCPPSOCKETQt::on_useGPUCheckBox_Changed(int state)
 	{
 		BackendGPU = 0;
 		ui.output->append("Use GPU + CUDA: set to NO");
+	}
+}
+
+void YOLOCPPSOCKETQt::on_BBoxCheckBox_Changed(int state)
+{
+	if (state == Qt::Checked)
+	{
+		ShowBBox = 1;
+		ui.output->append("Show Bounding Box: set to OPEN");
+	}
+	else if (state == Qt::Unchecked)
+	{
+		ShowBBox = 0;
+		ui.output->append("Show Bounding Box: set to CLOSED");
+	}
+}
+
+void YOLOCPPSOCKETQt::on_NameConfCheckBox_Changed(int state)
+{
+	if (state == Qt::Checked)
+	{
+		ShowObjNamesConf = 1;
+		ui.output->append("Show Object Name and Conf Value: set to OPEN");
+	}
+	else if (state == Qt::Unchecked)
+	{
+		ShowObjNamesConf = 0;
+		ui.output->append("Show Object Name and Conf Value: set to CLOSED");
+	}
+}
+
+void YOLOCPPSOCKETQt::on_ObjIndexCheckBox_Changed(int state)
+{
+	if (state == Qt::Checked)
+	{
+		ShowObjIndex = 1;
+		ui.output->append("Show Object Index: set to OPEN");
+	}
+	else if (state == Qt::Unchecked)
+	{
+		ShowObjIndex = 0;
+		ui.output->append("Show Object Index: set to CLOSED");
 	}
 }
