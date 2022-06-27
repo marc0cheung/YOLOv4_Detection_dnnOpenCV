@@ -55,9 +55,9 @@ int VideoSize_height = 540;
 int BackendGPU = 1;
 float confThreshold = 0.9; // Confidence threshold
 float nmsThreshold = 0.4;  // Non-maximum suppression threshold
-string cfgFile = "./network/2.cfg";
-string weightsFile = "./network/2.weights";
-string namesFile = "./network/2.names";
+string cfgFile = "./network/network_cfg_name.cfg";
+string weightsFile = "./network/network_weights_name.weights";
+string namesFile = "./network/object_names_file.names";
 
 
 // Initialize Json
