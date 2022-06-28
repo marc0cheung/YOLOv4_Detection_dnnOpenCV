@@ -16,6 +16,14 @@ public slots:
     void on_SelcPathBtn_Selected();
     void on_detect_btn_Selected();
     void on_saveThresholdBtn_Selected();
+    void on_SavePathBtn_Selected();
+
+    void on_save_cap_Selected();
+    void on_segment_save_Selected();
+    
+    void on_cfgFileBtn_Selected();
+    void on_namesFileBtn_Selected();
+    void on_weightsFileBtn_Selected();
 
     // For CheckBox
     void on_showNames_checkbox_Changed(int state);

@@ -28,6 +28,7 @@ using namespace dnn;
 
 Mat SourceImg;
 string SourceImgPath;
+string ResultSavePath;
 
 // Function Switch
 int ShowObjNames_Conf = 0;
@@ -37,9 +38,9 @@ float confThreshold = 0.7;
 float nmsThreshold = 0.4;
 
 // Bug Here
-string cfgFile = "D:/YOLO-CPP-SOCKET-Qt/QYoloImageDetection/network/button_v2.cfg";
-string weightsFile = "D:/YOLO-CPP-SOCKET-Qt/QYoloImageDetection/network/button_v2.weights";
-string namesFile = "D:/YOLO-CPP-SOCKET-Qt/QYoloImageDetection/network/button_v2.names";
+String cfgFile = "./network/button_v2.cfg";
+String weightsFile = "./network/button_v2.weights";
+String namesFile = "./network/button_v2.names";
 
 QYoloImageDetection::QYoloImageDetection(QWidget *parent)
     : QMainWindow(parent)
@@ -55,6 +56,16 @@ QYoloImageDetection::QYoloImageDetection(QWidget *parent)
     connect(ui.SelcPathBtn, SIGNAL(clicked()), this, SLOT(on_SelcPathBtn_Selected()));
 	connect(ui.detect_btn, SIGNAL(clicked()), this, SLOT(on_detect_btn_Selected()));
 	connect(ui.saveThresholdBtn, SIGNAL(clicked()), this, SLOT(on_saveThresholdBtn_Selected()));
+	connect(ui.SavePathBtn, SIGNAL(clicked()), this, SLOT(on_SavePathBtn_Selected()));
+
+	connect(ui.save_cap, SIGNAL(clicked()), this, SLOT(on_save_cap_Selected()));
+	connect(ui.segment_save, SIGNAL(clicked()), this, SLOT(on_segment_save_Selected()));
+
+	// Select Yolo Network Files
+	connect(ui.cfgFileBtn, SIGNAL(clicked()), this, SLOT(on_cfgFileBtn_Selected()));
+	connect(ui.namesFileBtn, SIGNAL(clicked()), this, SLOT(on_namesFileBtn_Selected()));
+	connect(ui.weightsFileBtn, SIGNAL(clicked()), this, SLOT(on_weightsFileBtn_Selected()));
+
 }
 
 void QYoloImageDetection::on_SelcPathBtn_Selected()
@@ -84,7 +95,8 @@ void QYoloImageDetection::on_detect_btn_Selected()
 		classes.push_back(line);
 
 	Net yolo_net;
-	yolo_net = readNetFromDarknet("./network/button_v2.cfg", "./network/button_v2.weights");
+	// yolo_net = readNetFromDarknet("./network/button_v2.cfg", "./network/button_v2.weights");
+	yolo_net = readNetFromDarknet(cfgFile, weightsFile);
 	yolo_net.setPreferableBackend(DNN_BACKEND_OPENCV);
 	yolo_net.setPreferableTarget(DNN_TARGET_CPU);
 
@@ -230,6 +242,66 @@ void QYoloImageDetection::on_saveThresholdBtn_Selected()
 	string threshold_msg = "Conf: " + to_string(confThreshold) + ", NMS: " + to_string(nmsThreshold);
 	ui.notification->setText(QString::fromStdString(threshold_msg));
 }
+
+void QYoloImageDetection::on_SavePathBtn_Selected()
+{
+	QString QSavePath = QFileDialog::getExistingDirectory();
+	if (QSavePath != "")
+	{
+		ui.savepath_label->setText(QSavePath);
+		ResultSavePath = QSavePath.toStdString();
+	}
+}
+
+// Incomplete Function
+void QYoloImageDetection::on_save_cap_Selected()
+{
+	// get detection result
+	// imwrite
+	ui.notification->setText("Detection Result Saved.");
+}
+
+// Incomplete Function
+void QYoloImageDetection::on_segment_save_Selected()
+{
+	// get object segment
+	// imwrite
+	ui.notification->setText("Segment Saved!");
+}
+
+void QYoloImageDetection::on_cfgFileBtn_Selected()
+{
+	QString QcfgPath = QFileDialog::getOpenFileName();
+	if (QcfgPath != "")
+	{
+		ui.cfgFilePath_Label->setText(QcfgPath);
+		// set global cfg file path
+		cfgFile = QcfgPath.toStdString();
+	}
+}
+
+void QYoloImageDetection::on_namesFileBtn_Selected()
+{
+	QString QnamesPath = QFileDialog::getOpenFileName();
+	if (QnamesPath != "")
+	{
+		ui.namesFilePath_Label->setText(QnamesPath);
+		// set global .names file path
+		namesFile = QnamesPath.toStdString();
+	}
+}
+
+void QYoloImageDetection::on_weightsFileBtn_Selected()
+{
+	QString QweightsPath = QFileDialog::getOpenFileName();
+	if (QweightsPath != "")
+	{
+		ui.weightsFilePath_Label->setText(QweightsPath);
+		// set global .weights file path
+		weightsFile = QweightsPath.toStdString();
+	}
+}
+
 
 QYoloImageDetection::~QYoloImageDetection()
 {}
