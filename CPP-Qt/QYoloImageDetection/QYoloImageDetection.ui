@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1011</width>
-    <height>349</height>
+    <height>366</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -61,7 +61,7 @@
      <rect>
       <x>40</x>
       <y>70</y>
-      <width>301</width>
+      <width>421</width>
       <height>20</height>
      </rect>
     </property>
@@ -71,7 +71,7 @@
      </font>
     </property>
     <property name="text">
-     <string>.names File:</string>
+     <string>.names File: button_v2.names (default)</string>
     </property>
    </widget>
    <widget class="QCheckBox" name="showBBox_checkbox">
@@ -95,7 +95,7 @@
      <rect>
       <x>40</x>
       <y>110</y>
-      <width>301</width>
+      <width>421</width>
       <height>20</height>
      </rect>
     </property>
@@ -105,7 +105,7 @@
      </font>
     </property>
     <property name="text">
-     <string>.weights File:</string>
+     <string>.weights File: button_v2.weights (default)</string>
     </property>
    </widget>
    <widget class="QLabel" name="NMSThreshold_label">
@@ -394,7 +394,7 @@ p, li { white-space: pre-wrap; }
      <rect>
       <x>40</x>
       <y>30</y>
-      <width>301</width>
+      <width>421</width>
       <height>20</height>
      </rect>
     </property>
@@ -404,7 +404,7 @@ p, li { white-space: pre-wrap; }
      </font>
     </property>
     <property name="text">
-     <string>.cfg File:</string>
+     <string>.cfg File: button_v2.cfg (default)</string>
     </property>
    </widget>
    <widget class="Line" name="line">
@@ -431,6 +431,19 @@ p, li { white-space: pre-wrap; }
     </property>
     <property name="orientation">
      <enum>Qt::Vertical</enum>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label">
+    <property name="geometry">
+     <rect>
+      <x>580</x>
+      <y>340</y>
+      <width>421</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Marco Cheung @ 2022, https://github.com/marc0cheung/</string>
     </property>
    </widget>
   </widget>

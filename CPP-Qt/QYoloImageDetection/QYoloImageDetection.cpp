@@ -268,130 +268,269 @@ void QYoloImageDetection::on_SavePathBtn_Selected()
 
 void QYoloImageDetection::on_save_cap_Selected()
 {
-	// get detection result
-	Mat frame = imread(SourceImgPath);
-
-	vector<string> classes;
-	String classesFile = namesFile;
-
-	ifstream ifs(classesFile.c_str());
-	string line;
-	while (getline(ifs, line))
-		classes.push_back(line);
-
-	Net yolo_net;
-	// yolo_net = readNetFromDarknet("./network/button_v2.cfg", "./network/button_v2.weights");
-	yolo_net = readNetFromDarknet(cfgFile, weightsFile);
-	yolo_net.setPreferableBackend(DNN_BACKEND_OPENCV);
-	yolo_net.setPreferableTarget(DNN_TARGET_CPU);
-
-	// Use YOLOv4-Tiny Net to Detect Object
-	Mat blob;
-	blobFromImage(frame, blob, 1 / 255.0, Size(416, 416), Scalar(0, 0, 0), true, false);
-	yolo_net.setInput(blob);
-
-	vector<Mat> outs;
-	yolo_net.forward(outs, yolo_net.getUnconnectedOutLayersNames());
-
-	// Postprocess(frame, outs)
-	vector<int> classIds;
-	vector<float> confidences;
-	vector<Rect> boxes;
-
-	for (size_t i = 0; i < outs.size(); ++i)
+	if (SourceImgPath == "")
 	{
-		// Scan through all the bounding boxes output from the network and keep only the
-		// ones with high confidence scores. Assign the box's class label as the class
-		// with the highest score for the box.
-		float* data = (float*)outs[i].data;
-		for (int j = 0; j < outs[i].rows; ++j, data += outs[i].cols)
-		{
-			Mat scores = outs[i].row(j).colRange(5, outs[i].cols);
-			Point classIdPoint;
-			double confidence;
-			// Get the value and location of the maximum score
-			minMaxLoc(scores, 0, &confidence, 0, &classIdPoint);
-			if (confidence > confThreshold)
-			{
-				int centerX = (int)(data[0] * frame.cols);
-				int centerY = (int)(data[1] * frame.rows);
-				int width = (int)(data[2] * frame.cols);
-				int height = (int)(data[3] * frame.rows);
-				int left = centerX - width / 2;
-				int top = centerY - height / 2;
-
-				classIds.push_back(classIdPoint.x);
-				confidences.push_back((float)confidence);
-				boxes.push_back(Rect(left, top, width, height));
-			}
-		}
-	}
-
-	vector<int> indices;
-	NMSBoxes(boxes, confidences, confThreshold, nmsThreshold, indices);
-
-	// Draw Predict Boxes
-	if (indices.size() > 0)
-	{
-		string notify_msg = to_string(indices.size()) + " Object Detected.";
-		ui.notification->setText(QString::fromStdString(notify_msg));
-
-		// Object_Count * 2 value per Coord * 5_Coordinates
-		//int* pRect = new int[indices.size() * 2 * 5];
-		for (size_t i = 0; i < indices.size(); ++i)
-		{
-			int idx = indices[i];
-			Rect box = boxes[idx];
-
-			if (ShowBBox == 1)
-			{
-				rectangle(frame, Point(box.x, box.y), Point(box.x + box.width, box.y + box.height), Scalar(0, 0, 255), 1);
-			}
-
-			string label = format("%.2f", confidences[idx]);
-			if (!classes.empty())
-			{
-				CV_Assert(classIds[idx] < (int)classes.size());
-				label = classes[classIds[idx]] + ":" + label;
-			}
-			int baseLine;
-			Size labelSize = getTextSize(label, FONT_HERSHEY_SIMPLEX, 0.5, 1, &baseLine);
-			box.y = max(box.y, labelSize.height);
-
-			if (ShowObjNames_Conf == 1)
-			{
-				putText(frame, label, Point(box.x, box.y), FONT_HERSHEY_SIMPLEX, 0.75, Scalar(0, 255, 0), 1);
-			}
-
-			std::string i_str = std::to_string(i + 1);
-
-			if (ShowObjectIndex == 1)
-			{
-				putText(frame, i_str, Point(box.x + box.width, box.y), FONT_HERSHEY_SIMPLEX, 0.75, Scalar(0, 0, 255), 1);
-			}
-
-		}
-	}
-	// imshow and imwrite
-	imshow("Detection Result", frame);
-
-	if (ResultSavePath != "")
-	{
-		imwrite(ResultSavePath + "/Result.png", frame);
-		ui.notification->setText("Detection Result Saved.");
+		QMessageBox::critical(NULL, "Detector Error", "Cannot Load Source Image", QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
 	}
 	else
 	{
-		QMessageBox::critical(NULL, "Save Result Error", "Haven't Select Save Path", QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
+		// get detection result
+		Mat frame = imread(SourceImgPath);
+
+		vector<string> classes;
+		String classesFile = namesFile;
+
+		ifstream ifs(classesFile.c_str());
+		string line;
+		while (getline(ifs, line))
+			classes.push_back(line);
+
+		Net yolo_net;
+		// yolo_net = readNetFromDarknet("./network/button_v2.cfg", "./network/button_v2.weights");
+		yolo_net = readNetFromDarknet(cfgFile, weightsFile);
+		yolo_net.setPreferableBackend(DNN_BACKEND_OPENCV);
+		yolo_net.setPreferableTarget(DNN_TARGET_CPU);
+
+		// Use YOLOv4-Tiny Net to Detect Object
+		Mat blob;
+		blobFromImage(frame, blob, 1 / 255.0, Size(416, 416), Scalar(0, 0, 0), true, false);
+		yolo_net.setInput(blob);
+
+		vector<Mat> outs;
+		yolo_net.forward(outs, yolo_net.getUnconnectedOutLayersNames());
+
+		// Postprocess(frame, outs)
+		vector<int> classIds;
+		vector<float> confidences;
+		vector<Rect> boxes;
+
+		for (size_t i = 0; i < outs.size(); ++i)
+		{
+			// Scan through all the bounding boxes output from the network and keep only the
+			// ones with high confidence scores. Assign the box's class label as the class
+			// with the highest score for the box.
+			float* data = (float*)outs[i].data;
+			for (int j = 0; j < outs[i].rows; ++j, data += outs[i].cols)
+			{
+				Mat scores = outs[i].row(j).colRange(5, outs[i].cols);
+				Point classIdPoint;
+				double confidence;
+				// Get the value and location of the maximum score
+				minMaxLoc(scores, 0, &confidence, 0, &classIdPoint);
+				if (confidence > confThreshold)
+				{
+					int centerX = (int)(data[0] * frame.cols);
+					int centerY = (int)(data[1] * frame.rows);
+					int width = (int)(data[2] * frame.cols);
+					int height = (int)(data[3] * frame.rows);
+					int left = centerX - width / 2;
+					int top = centerY - height / 2;
+
+					classIds.push_back(classIdPoint.x);
+					confidences.push_back((float)confidence);
+					boxes.push_back(Rect(left, top, width, height));
+				}
+			}
+		}
+
+		vector<int> indices;
+		NMSBoxes(boxes, confidences, confThreshold, nmsThreshold, indices);
+
+		// Draw Predict Boxes
+		if (indices.size() > 0)
+		{
+			string notify_msg = to_string(indices.size()) + " Object Detected.";
+			ui.notification->setText(QString::fromStdString(notify_msg));
+
+			// Object_Count * 2 value per Coord * 5_Coordinates
+			//int* pRect = new int[indices.size() * 2 * 5];
+			for (size_t i = 0; i < indices.size(); ++i)
+			{
+				int idx = indices[i];
+				Rect box = boxes[idx];
+
+				if (ShowBBox == 1)
+				{
+					rectangle(frame, Point(box.x, box.y), Point(box.x + box.width, box.y + box.height), Scalar(0, 0, 255), 1);
+				}
+
+				string label = format("%.2f", confidences[idx]);
+				if (!classes.empty())
+				{
+					CV_Assert(classIds[idx] < (int)classes.size());
+					label = classes[classIds[idx]] + ":" + label;
+				}
+				int baseLine;
+				Size labelSize = getTextSize(label, FONT_HERSHEY_SIMPLEX, 0.5, 1, &baseLine);
+				box.y = max(box.y, labelSize.height);
+
+				if (ShowObjNames_Conf == 1)
+				{
+					putText(frame, label, Point(box.x, box.y), FONT_HERSHEY_SIMPLEX, 0.75, Scalar(0, 255, 0), 1);
+				}
+
+				std::string i_str = std::to_string(i + 1);
+
+				if (ShowObjectIndex == 1)
+				{
+					putText(frame, i_str, Point(box.x + box.width, box.y), FONT_HERSHEY_SIMPLEX, 0.75, Scalar(0, 0, 255), 1);
+				}
+
+			}
+		}
+		// imshow and imwrite
+		imshow("Detection Result", frame);
+
+		if (ResultSavePath != "")
+		{
+			imwrite(ResultSavePath + "/Result.png", frame);
+			ui.notification->setText("Detection Result Saved.");
+		}
+		else
+		{
+			QMessageBox::critical(NULL, "Save Result Error", "Haven't Select Save Path", QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
+		}
 	}
 }
 
-// Incomplete Function
+
 void QYoloImageDetection::on_segment_save_Selected()
 {
 	// get object segment
-	// imwrite
-	ui.notification->setText("Segment Saved!");
+	if (SourceImgPath == "")
+	{
+		QMessageBox::critical(NULL, "Detector Error", "Cannot Load Source Image", QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
+	}
+	else
+	{
+		if ((cfgFile == "./network/button_v2.cfg") & (weightsFile == "./network/button_v2.weights") & (namesFile == "./network/button_v2.names"))
+		{
+			QMessageBox::information(NULL, "Haven't Set Darknet File", "Use Default Network Configuration: Button_v2", QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
+		}
+
+		Mat frame = imread(SourceImgPath);
+
+		vector<string> classes;
+		String classesFile = namesFile;
+
+		ifstream ifs(classesFile.c_str());
+		string line;
+		while (getline(ifs, line))
+			classes.push_back(line);
+
+		Net yolo_net;
+		// yolo_net = readNetFromDarknet("./network/button_v2.cfg", "./network/button_v2.weights");
+		yolo_net = readNetFromDarknet(cfgFile, weightsFile);
+		yolo_net.setPreferableBackend(DNN_BACKEND_OPENCV);
+		yolo_net.setPreferableTarget(DNN_TARGET_CPU);
+
+		// Use YOLOv4-Tiny Net to Detect Object
+		Mat blob;
+		blobFromImage(frame, blob, 1 / 255.0, Size(416, 416), Scalar(0, 0, 0), true, false);
+		yolo_net.setInput(blob);
+
+		vector<Mat> outs;
+		yolo_net.forward(outs, yolo_net.getUnconnectedOutLayersNames());
+
+		// Postprocess(frame, outs)
+		vector<int> classIds;
+		vector<float> confidences;
+		vector<Rect> boxes;
+
+		for (size_t i = 0; i < outs.size(); ++i)
+		{
+			// Scan through all the bounding boxes output from the network and keep only the
+			// ones with high confidence scores. Assign the box's class label as the class
+			// with the highest score for the box.
+			float* data = (float*)outs[i].data;
+			for (int j = 0; j < outs[i].rows; ++j, data += outs[i].cols)
+			{
+				Mat scores = outs[i].row(j).colRange(5, outs[i].cols);
+				Point classIdPoint;
+				double confidence;
+				// Get the value and location of the maximum score
+				minMaxLoc(scores, 0, &confidence, 0, &classIdPoint);
+				if (confidence > confThreshold)
+				{
+					int centerX = (int)(data[0] * frame.cols);
+					int centerY = (int)(data[1] * frame.rows);
+					int width = (int)(data[2] * frame.cols);
+					int height = (int)(data[3] * frame.rows);
+					int left = centerX - width / 2;
+					int top = centerY - height / 2;
+
+					classIds.push_back(classIdPoint.x);
+					confidences.push_back((float)confidence);
+					boxes.push_back(Rect(left, top, width, height));
+				}
+			}
+		}
+
+		vector<int> indices;
+		NMSBoxes(boxes, confidences, confThreshold, nmsThreshold, indices);
+
+
+		// Draw Predict Boxes
+		if (indices.size() > 0)
+		{
+			string notify_msg = to_string(indices.size()) + " Object Detected.";
+			ui.notification->setText(QString::fromStdString(notify_msg));
+
+			// Object_Count * 2 value per Coord * 5_Coordinates
+			//int* pRect = new int[indices.size() * 2 * 5];
+			for (size_t i = 0; i < indices.size(); ++i)
+			{
+				int idx = indices[i];
+				Rect box = boxes[idx];
+
+				if (ShowBBox == 1)
+				{
+					rectangle(frame, Point(box.x, box.y), Point(box.x + box.width, box.y + box.height), Scalar(0, 0, 255), 1);
+				}
+
+				string label = format("%.2f", confidences[idx]);
+				if (!classes.empty())
+				{
+					CV_Assert(classIds[idx] < (int)classes.size());
+					label = classes[classIds[idx]] + ":" + label;
+				}
+				int baseLine;
+				Size labelSize = getTextSize(label, FONT_HERSHEY_SIMPLEX, 0.5, 1, &baseLine);
+				box.y = max(box.y, labelSize.height);
+
+				if (ShowObjNames_Conf == 1)
+				{
+					putText(frame, label, Point(box.x, box.y), FONT_HERSHEY_SIMPLEX, 0.75, Scalar(0, 255, 0), 1);
+				}
+
+				std::string i_str = std::to_string(i + 1);
+
+				if (ShowObjectIndex == 1)
+				{
+					putText(frame, i_str, Point(box.x + box.width, box.y), FONT_HERSHEY_SIMPLEX, 0.75, Scalar(0, 0, 255), 1);
+				}
+
+				Rect roi_selector = Rect(box.x, box.y, box.width, box.height);
+				//imshow("Segment_" + to_string(i), frame(roi_selector));
+				
+				// Pop up Error while no Save Path Selected
+				if (ResultSavePath == "")
+				{
+					QMessageBox::critical(NULL, "Segment Save Error", "No Save Path Selected!", QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
+					ui.notification->setText("Segment Save Error!");
+					break;
+				}
+				else
+				{
+					imwrite(ResultSavePath + "/Segment_" + to_string(i) + ".png", frame(roi_selector));
+					ui.notification->setText("Segment Saved!");
+				}
+
+			}
+		}
+
+		imshow("Detected Result", frame);
+	}
 }
 
 void QYoloImageDetection::on_cfgFileBtn_Selected()
