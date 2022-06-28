@@ -174,40 +174,40 @@ void YOLOCPPSOCKETQt::showStartupConfig()
 		ui.output->append("[10] Show Conf Value: CLOSED");
 	
 	if (VideoStream == 1)
-		ui.output->append("[8] OpenCV Video Stream: OPEN");
+		ui.output->append("[11] OpenCV Video Stream: OPEN");
 	else
-		ui.output->append("[8] OpenCV Video Stream: CLOSED");
+		ui.output->append("[11] OpenCV Video Stream: CLOSED");
 
 	if (VideoFlip == 1)
-		ui.output->append("[9] OpenCV Video Flip: OPEN");
+		ui.output->append("[12] OpenCV Video Flip: OPEN");
 	else
-		ui.output->append("[9] OpenCV Video Flip: CLOSED");
+		ui.output->append("[12] OpenCV Video Flip: CLOSED");
 	
 	if (BackendGPU == 1)
-		ui.output->append("[10] Use GPU + CUDA: YES");
+		ui.output->append("[13] Use GPU + CUDA: YES");
 	else
-		ui.output->append("[10] Use GPU + CUDA: NO");
+		ui.output->append("[13] Use GPU + CUDA: NO");
 
-	string videoSize_msg = "[11] Current Video Size: " + to_string(VideoSize_width) + " X " + to_string(VideoSize_height);
+	string videoSize_msg = "[14] Current Video Size: " + to_string(VideoSize_width) + " X " + to_string(VideoSize_height);
 	ui.output->append(QString::fromStdString(videoSize_msg));
 	
-	string cfg_file_path = "[12] .cfg File in use: ";
+	string cfg_file_path = "[15] .cfg File in use: ";
 	cfg_file_path.append(cfgFile);
 	ui.output->append(QString::fromStdString(cfg_file_path));
 
-	string weights_file_path = "[13] .weights_file_path File in use: ";
+	string weights_file_path = "[16] .weights_file_path File in use: ";
 	weights_file_path.append(weightsFile);
 	ui.output->append(QString::fromStdString(weights_file_path));
 
-	string names_file_path = "[14] .names File in use: ";
+	string names_file_path = "[17] .names File in use: ";
 	names_file_path.append(namesFile);
 	ui.output->append(QString::fromStdString(names_file_path));
 
-	string conf_str = "[15] Confident Threshold: ";
+	string conf_str = "[18] Confident Threshold: ";
 	conf_str.append(to_string(confThreshold));
 	ui.output->append(QString::fromStdString(conf_str));
 
-	string nms_str = "[16] NMS Threshold: ";
+	string nms_str = "[19] NMS Threshold: ";
 	nms_str.append(to_string(nmsThreshold));
 	ui.output->append(QString::fromStdString(nms_str));
 

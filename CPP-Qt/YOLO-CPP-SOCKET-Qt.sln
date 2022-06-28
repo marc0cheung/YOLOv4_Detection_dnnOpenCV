@@ -5,6 +5,8 @@ VisualStudioVersion = 16.0.32413.511
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "YOLO-CPP-SOCKET-Qt", "YOLO-CPP-SOCKET-Qt.vcxproj", "{F06251A8-703E-4FB5-94E0-6E43BAAEF54F}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "QYoloImageDetection", "QYoloImageDetection\QYoloImageDetection.vcxproj", "{3C87E2CC-D23B-454D-B053-2AC45E95B872}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -15,6 +17,10 @@ Global
 		{F06251A8-703E-4FB5-94E0-6E43BAAEF54F}.Debug|x64.Build.0 = Debug|x64
 		{F06251A8-703E-4FB5-94E0-6E43BAAEF54F}.Release|x64.ActiveCfg = Release|x64
 		{F06251A8-703E-4FB5-94E0-6E43BAAEF54F}.Release|x64.Build.0 = Release|x64
+		{3C87E2CC-D23B-454D-B053-2AC45E95B872}.Debug|x64.ActiveCfg = Debug|x64
+		{3C87E2CC-D23B-454D-B053-2AC45E95B872}.Debug|x64.Build.0 = Debug|x64
+		{3C87E2CC-D23B-454D-B053-2AC45E95B872}.Release|x64.ActiveCfg = Release|x64
+		{3C87E2CC-D23B-454D-B053-2AC45E95B872}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
