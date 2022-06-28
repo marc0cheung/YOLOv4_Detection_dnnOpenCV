@@ -71,7 +71,7 @@
      </font>
     </property>
     <property name="text">
-     <string>.names File: network/1.names</string>
+     <string>.names File:</string>
     </property>
    </widget>
    <widget class="QCheckBox" name="showBBox_checkbox">
@@ -105,7 +105,7 @@
      </font>
     </property>
     <property name="text">
-     <string>.weights File: network/1.weights</string>
+     <string>.weights File:</string>
     </property>
    </widget>
    <widget class="QLabel" name="NMSThreshold_label">
@@ -404,7 +404,33 @@ p, li { white-space: pre-wrap; }
      </font>
     </property>
     <property name="text">
-     <string>.cfg File: network/1.cfg</string>
+     <string>.cfg File:</string>
+    </property>
+   </widget>
+   <widget class="Line" name="line">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>150</y>
+      <width>971</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="orientation">
+     <enum>Qt::Horizontal</enum>
+    </property>
+   </widget>
+   <widget class="Line" name="line_2">
+    <property name="geometry">
+     <rect>
+      <x>610</x>
+      <y>10</y>
+      <width>20</width>
+      <height>141</height>
+     </rect>
+    </property>
+    <property name="orientation">
+     <enum>Qt::Vertical</enum>
     </property>
    </widget>
   </widget>
