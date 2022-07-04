@@ -9,6 +9,7 @@ class QYoloImageDetection : public QMainWindow
 
 public:
     QYoloImageDetection(QWidget *parent = nullptr);
+    void Socket_SendCoord(std::string sendData);
     ~QYoloImageDetection();
 
 public slots:

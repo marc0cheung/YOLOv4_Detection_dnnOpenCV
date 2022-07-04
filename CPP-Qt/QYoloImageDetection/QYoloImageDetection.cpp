@@ -50,11 +50,7 @@ String namesFile = "./network/button_v2.names";
 
 // YOLO Detection Function
 Mat Detection(Mat frame);
-
-// Socket Send and Recv Function
-void Send(SOCKET client, char send_buf[]);
-void Recv(SOCKET client, char recv_buf[]);
-
+void sendCoords(int nNum, int* pRectPoints);
 
 QYoloImageDetection::QYoloImageDetection(QWidget *parent)
     : QMainWindow(parent)
@@ -122,54 +118,17 @@ void QYoloImageDetection::on_detect_btn_Selected()
 }
 
 // Open Socket to receive and send coordinates in real-time
-// Bug Here!!!
 void QYoloImageDetection::on_openSocketCheckbox_Changed(int state)
 {
 	if (state == Qt::Checked)
 	{
-		WORD wVersion = MAKEWORD(2, 2);
-		WSADATA wsadata;
-		if (WSAStartup(wVersion, &wsadata) != 0)
-		{
-			ui.notification->setText("WSA StartUp Error");
-		}
-
-		SOCKET s = socket(AF_INET, SOCK_STREAM, 0); 
-		if (s == INVALID_SOCKET)
-		{
-			ui.notification->setText("Invalid Socket.");
-		}
-
-		sockaddr_in add;
-		int len = sizeof(sockaddr_in);
-		add.sin_family = AF_INET;
-		add.sin_addr.S_un.S_addr = inet_addr("127.0.0.1");
-		add.sin_port = htons(8888);
-
-		int i = ::connect(s, (sockaddr*)&add, len);
-		if (SOCKET_ERROR == i)
-		{
-			ui.notification->setText("Connect Error.");
-		}
-
-		char sbuf[256] = { 0 };
-		int ret = recv(s, sbuf, 256, 0);
-		if (ret == 0)
-		{
-			ui.notification->setText("Connection Stopped.");
-		}
-		else if (ret > 0)
-		{
-			ui.notification->setText(sbuf);
-		}
-
-		closesocket(s);
-
-		WSACleanup();
 		// If get frame input from socket -> start object dectection -> send object coordinates
+		openSocket = 1;
+		ui.notification->setText("Socket: OPEN");
 	}
 	else if (state == Qt::Unchecked)
 	{
+		openSocket = 0;
 		ui.notification->setText("Socket: CLOSED");
 	}
 }
@@ -544,6 +503,52 @@ void QYoloImageDetection::on_weightsFileBtn_Selected()
 	}
 }
 
+void QYoloImageDetection::Socket_SendCoord(string sendData)
+{
+	int send_len = 0;
+	int recv_len = 0;
+
+	char send_buf[1024];
+	strcpy(send_buf, sendData.c_str());
+	//char recv_len[100];
+
+	SOCKET s_server;
+	SOCKADDR_IN server_addr;
+
+	WORD wVersion = MAKEWORD(2, 2);
+	WSADATA wsadata;
+	if (WSAStartup(wVersion, &wsadata) != 0)
+	{
+		ui.notification->setText("WSA StartUp Error");
+	}
+
+	SOCKET s = socket(AF_INET, SOCK_STREAM, 0);
+	if (s == INVALID_SOCKET)
+	{
+		ui.notification->setText("Invalid Socket.");
+	}
+
+	server_addr.sin_family = AF_INET;
+	server_addr.sin_addr.S_un.S_addr = inet_addr("127.0.0.1");
+	server_addr.sin_port = htons(1234);
+
+	s_server = socket(AF_INET, SOCK_STREAM, 0);
+
+	if (::connect(s_server, (SOCKADDR*)&server_addr, sizeof(SOCKADDR)) == SOCKET_ERROR) {
+		ui.notification->setText("Connect Error");
+		WSACleanup();
+	}
+
+	send_len = send(s_server, send_buf, 100, 0);
+	if (send_len < 0)
+	{
+		ui.notification->setText("send error");
+	}
+
+	closesocket(s_server);
+	WSACleanup();
+}
+
 QYoloImageDetection::~QYoloImageDetection()
 {}
 
@@ -616,8 +621,9 @@ Mat Detection(Mat frame)
 		// string notify_msg = to_string(indices.size()) + " Object Detected.";
 		// ui.notification->setText(QString::fromStdString(notify_msg));
 
-		// Object_Count * 2 value per Coord * 5_Coordinates
-		//int* pRect = new int[indices.size() * 2 * 5];
+		// Object_Count * 2 value per Coord * 5_Coordinates per Obj
+		int* pRect = new int[indices.size() * 2 * 5];
+		
 		for (size_t i = 0; i < indices.size(); ++i)
 		{
 			int idx = indices[i];
@@ -650,21 +656,94 @@ Mat Detection(Mat frame)
 				putText(frame, i_str, Point(box.x + box.width, box.y), FONT_HERSHEY_SIMPLEX, 0.75, Scalar(0, 0, 255), 1);
 			}
 
-		}
-	}
+			// Use String to send coordinates to receiver, but needs decoding process.
+			String sendData;
+			sendData += "Object_" + to_string(i + 1) + "\n[(";                                              // Object Count
+			sendData += to_string(box.x) + "," + to_string(box.y) + ")-(";                                 // Point 1
+			sendData += to_string(box.x + box.width) + "," + to_string(box.y) + ")-(";                    // Point 2
+			sendData += to_string(box.x) + ", " + to_string(box.y + box.height) + ")-(";                 // Point 3
+			sendData += to_string(box.x + box.width) + "," + to_string(box.y + box.height) + ")-(";      // Point 4
+			sendData += to_string(box.x + (box.width / 2)) + "," + to_string(box.y + (box.height / 2)) + ")]";  // Point 5
 
+			// save each target's coordinates to pRect
+			// Point 1
+			pRect[i * 10 + 0] = box.x;
+			pRect[i * 10 + 1] = box.y;
+			// Point 2
+			pRect[i * 10 + 2] = box.x + box.width;
+			pRect[i * 10 + 3] = box.y;
+			// Point 3
+			pRect[i * 10 + 4] = box.x;
+			pRect[i * 10 + 5] = box.y + box.height;
+			// Point 4
+			pRect[i * 10 + 6] = box.x + box.width;
+			pRect[i * 10 + 7] = box.y + box.height;
+			// Center Point
+			pRect[i * 10 + 8] = (int)((box.x + box.width) / 2);
+			pRect[i * 10 + 9] = (int)((box.y + box.height) / 2);
+
+
+			// strcpy(send_buf, sendData.c_str());
+			// send_len = send(s_server, send_buf, 100, 0);
+
+		}
+		sendCoords(indices.size(), pRect);
+	}
 	return frame;
 }
 
-void Send(SOCKET client, char send_buf[])
+void sendCoords(int nNum, int* pRectPoints)
 {
-}
+	int send_len = 0;
+	char send_buf[2048];
 
-void Recv(SOCKET client, char recv_buf[])
-{
-	while (true)
+	SOCKET s_server;
+	SOCKADDR_IN server_addr;
+
+	WORD wVersion = MAKEWORD(2, 2);
+	WSADATA wsadata;
+	if (WSAStartup(wVersion, &wsadata) != 0)
 	{
-		recv(client, recv_buf, 100, 0);
-		// Return Recv_Buff
+		cout << "WSA StartUp Error" << endl;
 	}
+
+	SOCKET s = socket(AF_INET, SOCK_STREAM, 0);
+	if (s == INVALID_SOCKET)
+	{
+		cout << "Invalid Socket." << endl;
+	}
+
+	server_addr.sin_family = AF_INET;
+	server_addr.sin_addr.S_un.S_addr = inet_addr("127.0.0.1");
+	server_addr.sin_port = htons(1234);
+
+	s_server = socket(AF_INET, SOCK_STREAM, 0);
+
+	if (::connect(s_server, (SOCKADDR*)&server_addr, sizeof(SOCKADDR)) == SOCKET_ERROR) {
+		cout << "Connect Error" << endl;
+		WSACleanup();
+	}
+
+	for (int i = 0; i < nNum; i++)
+	{
+		string targetMsg = "[(" + to_string(pRectPoints[i * 10 + 0]) + "," + to_string(pRectPoints[i * 10 + 1]) + "),(" +
+			to_string(pRectPoints[i * 10 + 2]) + "," + to_string(pRectPoints[i * 10 + 3]) + "),(" +
+			to_string(pRectPoints[i * 10 + 4]) + "," + to_string(pRectPoints[i * 10 + 5]) + "),(" +
+			to_string(pRectPoints[i * 10 + 6]) + "," + to_string(pRectPoints[i * 10 + 7]) + "),(" +
+			to_string(pRectPoints[i * 10 + 8]) + "," + to_string(pRectPoints[i * 10 + 9]) + ")]";
+		
+		// Bug Here.
+		strcpy(send_buf, strdup(targetMsg.c_str()));
+		send_len = send(s_server, send_buf, 2048, 0);
+	}
+
+	
+	if (send_len < 0)
+	{
+		cout << "send error" << endl;
+	}
+
+	closesocket(s_server);
+	WSACleanup();
+
 }
