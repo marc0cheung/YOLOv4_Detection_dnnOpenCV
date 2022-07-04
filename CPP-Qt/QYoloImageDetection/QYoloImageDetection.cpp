@@ -23,6 +23,11 @@
 #include <opencv2/imgproc.hpp>
 #include <opencv2/highgui.hpp>
 
+#include <winsock.h>
+#pragma comment(lib,"ws2_32.lib")
+#pragma warning(disable:4996)
+#include <thread>
+
 using namespace std;
 using namespace cv;
 using namespace dnn;
@@ -35,12 +40,21 @@ string ResultSavePath = "";
 int ShowObjNames_Conf = 0;
 int ShowBBox = 1;
 int ShowObjectIndex = 0;
+int openSocket = 0;
 float confThreshold = 0.7;
 float nmsThreshold = 0.4;
 
 String cfgFile = "./network/button_v2.cfg";
 String weightsFile = "./network/button_v2.weights";
 String namesFile = "./network/button_v2.names";
+
+// YOLO Detection Function
+Mat Detection(Mat frame);
+
+// Socket Send and Recv Function
+void Send(SOCKET client, char send_buf[]);
+void Recv(SOCKET client, char recv_buf[]);
+
 
 QYoloImageDetection::QYoloImageDetection(QWidget *parent)
     : QMainWindow(parent)
@@ -51,6 +65,7 @@ QYoloImageDetection::QYoloImageDetection(QWidget *parent)
 	connect(ui.showNames_checkbox, SIGNAL(stateChanged(int)), this, SLOT(on_showNames_checkbox_Changed(int)));
 	connect(ui.objIndex_checkbox, SIGNAL(stateChanged(int)), this, SLOT(on_objIndex_checkbox_Changed(int)));
 	connect(ui.showBBox_checkbox, SIGNAL(stateChanged(int)), this, SLOT(on_showBBox_checkbox_Changed(int)));
+	connect(ui.openSocketCheckbox, SIGNAL(stateChanged(int)), this, SLOT(on_openSocketCheckbox_Changed(int)));
 
     // Push Button Signals and Slots
     connect(ui.SelcPathBtn, SIGNAL(clicked()), this, SLOT(on_SelcPathBtn_Selected()));
@@ -68,6 +83,7 @@ QYoloImageDetection::QYoloImageDetection(QWidget *parent)
 
 }
 
+// Select Source Image Path Manually
 void QYoloImageDetection::on_SelcPathBtn_Selected()
 {
 	QString QSourceImagePath = QFileDialog::getOpenFileName(this, "Select Source Image", "./");
@@ -82,6 +98,7 @@ void QYoloImageDetection::on_SelcPathBtn_Selected()
 	}
 }
 
+// Click "Go" Button to run YOLO Image Detection
 void QYoloImageDetection::on_detect_btn_Selected()
 {
 	if (SourceImgPath == "")
@@ -97,114 +114,67 @@ void QYoloImageDetection::on_detect_btn_Selected()
 		
 		Mat frame = imread(SourceImgPath);
 
-		vector<string> classes;
-		String classesFile = namesFile;
-
-		ifstream ifs(classesFile.c_str());
-		string line;
-		while (getline(ifs, line))
-			classes.push_back(line);
-
-		Net yolo_net;
-		// yolo_net = readNetFromDarknet("./network/button_v2.cfg", "./network/button_v2.weights");
-		yolo_net = readNetFromDarknet(cfgFile, weightsFile);
-		yolo_net.setPreferableBackend(DNN_BACKEND_OPENCV);
-		yolo_net.setPreferableTarget(DNN_TARGET_CPU);
-
-		// Use YOLOv4-Tiny Net to Detect Object
-		Mat blob;
-		blobFromImage(frame, blob, 1 / 255.0, Size(416, 416), Scalar(0, 0, 0), true, false);
-		yolo_net.setInput(blob);
-
-		vector<Mat> outs;
-		yolo_net.forward(outs, yolo_net.getUnconnectedOutLayersNames());
-
-		// Postprocess(frame, outs)
-		vector<int> classIds;
-		vector<float> confidences;
-		vector<Rect> boxes;
-
-		for (size_t i = 0; i < outs.size(); ++i)
-		{
-			// Scan through all the bounding boxes output from the network and keep only the
-			// ones with high confidence scores. Assign the box's class label as the class
-			// with the highest score for the box.
-			float* data = (float*)outs[i].data;
-			for (int j = 0; j < outs[i].rows; ++j, data += outs[i].cols)
-			{
-				Mat scores = outs[i].row(j).colRange(5, outs[i].cols);
-				Point classIdPoint;
-				double confidence;
-				// Get the value and location of the maximum score
-				minMaxLoc(scores, 0, &confidence, 0, &classIdPoint);
-				if (confidence > confThreshold)
-				{
-					int centerX = (int)(data[0] * frame.cols);
-					int centerY = (int)(data[1] * frame.rows);
-					int width = (int)(data[2] * frame.cols);
-					int height = (int)(data[3] * frame.rows);
-					int left = centerX - width / 2;
-					int top = centerY - height / 2;
-
-					classIds.push_back(classIdPoint.x);
-					confidences.push_back((float)confidence);
-					boxes.push_back(Rect(left, top, width, height));
-				}
-			}
-		}
-
-		vector<int> indices;
-		NMSBoxes(boxes, confidences, confThreshold, nmsThreshold, indices);
-		
-
-		// Draw Predict Boxes
-		if (indices.size() > 0)
-		{
-			string notify_msg = to_string(indices.size()) + " Object Detected.";
-			ui.notification->setText(QString::fromStdString(notify_msg));
-
-			// Object_Count * 2 value per Coord * 5_Coordinates
-			//int* pRect = new int[indices.size() * 2 * 5];
-			for (size_t i = 0; i < indices.size(); ++i)
-			{
-				int idx = indices[i];
-				Rect box = boxes[idx];
-
-				if (ShowBBox == 1)
-				{
-					rectangle(frame, Point(box.x, box.y), Point(box.x + box.width, box.y + box.height), Scalar(0, 0, 255), 1);
-				}
-
-				string label = format("%.2f", confidences[idx]);
-				if (!classes.empty())
-				{
-					CV_Assert(classIds[idx] < (int)classes.size());
-					label = classes[classIds[idx]] + ":" + label;
-				}
-				int baseLine;
-				Size labelSize = getTextSize(label, FONT_HERSHEY_SIMPLEX, 0.5, 1, &baseLine);
-				box.y = max(box.y, labelSize.height);
-
-				if (ShowObjNames_Conf == 1)
-				{
-					putText(frame, label, Point(box.x, box.y), FONT_HERSHEY_SIMPLEX, 0.75, Scalar(0, 255, 0), 1);
-				}
-
-				std::string i_str = std::to_string(i + 1);
-
-				if (ShowObjectIndex == 1)
-				{
-					putText(frame, i_str, Point(box.x + box.width, box.y), FONT_HERSHEY_SIMPLEX, 0.75, Scalar(0, 0, 255), 1);
-				}
-
-			}
-		}
+		frame = Detection(frame);
 
 		// SHOW DETECTION RESULT
 		imshow("Detection Result", frame);
 	}
 }
 
+// Open Socket to receive and send coordinates in real-time
+// Bug Here!!!
+void QYoloImageDetection::on_openSocketCheckbox_Changed(int state)
+{
+	if (state == Qt::Checked)
+	{
+		WORD wVersion = MAKEWORD(2, 2);
+		WSADATA wsadata;
+		if (WSAStartup(wVersion, &wsadata) != 0)
+		{
+			ui.notification->setText("WSA StartUp Error");
+		}
+
+		SOCKET s = socket(AF_INET, SOCK_STREAM, 0); 
+		if (s == INVALID_SOCKET)
+		{
+			ui.notification->setText("Invalid Socket.");
+		}
+
+		sockaddr_in add;
+		int len = sizeof(sockaddr_in);
+		add.sin_family = AF_INET;
+		add.sin_addr.S_un.S_addr = inet_addr("127.0.0.1");
+		add.sin_port = htons(8888);
+
+		int i = ::connect(s, (sockaddr*)&add, len);
+		if (SOCKET_ERROR == i)
+		{
+			ui.notification->setText("Connect Error.");
+		}
+
+		char sbuf[256] = { 0 };
+		int ret = recv(s, sbuf, 256, 0);
+		if (ret == 0)
+		{
+			ui.notification->setText("Connection Stopped.");
+		}
+		else if (ret > 0)
+		{
+			ui.notification->setText(sbuf);
+		}
+
+		closesocket(s);
+
+		WSACleanup();
+		// If get frame input from socket -> start object dectection -> send object coordinates
+	}
+	else if (state == Qt::Unchecked)
+	{
+		ui.notification->setText("Socket: CLOSED");
+	}
+}
+
+// Choose whether to display Object Names on the result image
 void QYoloImageDetection::on_showNames_checkbox_Changed(int state)
 {
 	if (state == Qt::Checked)
@@ -219,6 +189,7 @@ void QYoloImageDetection::on_showNames_checkbox_Changed(int state)
 	}
 }
 
+// Choose whether to display object index on the result image
 void QYoloImageDetection::on_objIndex_checkbox_Changed(int state)
 {
 	if (state == Qt::Checked)
@@ -233,6 +204,7 @@ void QYoloImageDetection::on_objIndex_checkbox_Changed(int state)
 	}
 }
 
+// Choose whether to display bounding box on the result image
 void QYoloImageDetection::on_showBBox_checkbox_Changed(int state)
 {
 	if (state == Qt::Checked)
@@ -247,6 +219,7 @@ void QYoloImageDetection::on_showBBox_checkbox_Changed(int state)
 	}
 }
 
+// Save the 2 threshold values from the InputBoxes
 void QYoloImageDetection::on_saveThresholdBtn_Selected()
 {
 	confThreshold = stof((ui.confThreshold_Input->toPlainText()).toStdString());
@@ -256,6 +229,7 @@ void QYoloImageDetection::on_saveThresholdBtn_Selected()
 	ui.notification->setText(QString::fromStdString(threshold_msg));
 }
 
+// Select saving path of the Result Image
 void QYoloImageDetection::on_SavePathBtn_Selected()
 {
 	QString QSavePath = QFileDialog::getExistingDirectory();
@@ -266,6 +240,7 @@ void QYoloImageDetection::on_SavePathBtn_Selected()
 	}
 }
 
+// Click "SaveCap" Button to save the whole result image
 void QYoloImageDetection::on_save_cap_Selected()
 {
 	if (SourceImgPath == "")
@@ -393,7 +368,7 @@ void QYoloImageDetection::on_save_cap_Selected()
 	}
 }
 
-
+// Click "Segment_Save" Button to save each segment(s) of the target object(s)
 void QYoloImageDetection::on_segment_save_Selected()
 {
 	// get object segment
@@ -533,6 +508,7 @@ void QYoloImageDetection::on_segment_save_Selected()
 	}
 }
 
+// Select .cfg file of darknet
 void QYoloImageDetection::on_cfgFileBtn_Selected()
 {
 	QString QcfgPath = QFileDialog::getOpenFileName();
@@ -544,6 +520,7 @@ void QYoloImageDetection::on_cfgFileBtn_Selected()
 	}
 }
 
+// Select .names file of darknet
 void QYoloImageDetection::on_namesFileBtn_Selected()
 {
 	QString QnamesPath = QFileDialog::getOpenFileName();
@@ -555,6 +532,7 @@ void QYoloImageDetection::on_namesFileBtn_Selected()
 	}
 }
 
+// Select .weights file of darknet
 void QYoloImageDetection::on_weightsFileBtn_Selected()
 {
 	QString QweightsPath = QFileDialog::getOpenFileName();
@@ -568,3 +546,125 @@ void QYoloImageDetection::on_weightsFileBtn_Selected()
 
 QYoloImageDetection::~QYoloImageDetection()
 {}
+
+// Use Yolo Network for object detection
+Mat Detection(Mat frame)
+{
+	vector<string> classes;
+	String classesFile = namesFile;
+
+	ifstream ifs(classesFile.c_str());
+	string line;
+	while (getline(ifs, line))
+		classes.push_back(line);
+
+	// Load Yolo network
+	Net yolo_net;
+	yolo_net = readNetFromDarknet(cfgFile, weightsFile);
+	yolo_net.setPreferableBackend(DNN_BACKEND_OPENCV);
+	yolo_net.setPreferableTarget(DNN_TARGET_CPU);
+
+	// Use YOLOv4-Tiny Net to Detect Object
+	Mat blob;
+	blobFromImage(frame, blob, 1 / 255.0, Size(416, 416), Scalar(0, 0, 0), true, false);
+	yolo_net.setInput(blob);
+
+	vector<Mat> outs;
+	yolo_net.forward(outs, yolo_net.getUnconnectedOutLayersNames());
+
+	// Postprocess(frame, outs)
+	vector<int> classIds;
+	vector<float> confidences;
+	vector<Rect> boxes;
+
+	for (size_t i = 0; i < outs.size(); ++i)
+	{
+		// Scan through all the bounding boxes output from the network and keep only the
+		// ones with high confidence scores. Assign the box's class label as the class
+		// with the highest score for the box.
+		float* data = (float*)outs[i].data;
+		for (int j = 0; j < outs[i].rows; ++j, data += outs[i].cols)
+		{
+			Mat scores = outs[i].row(j).colRange(5, outs[i].cols);
+			Point classIdPoint;
+			double confidence;
+			// Get the value and location of the maximum score
+			minMaxLoc(scores, 0, &confidence, 0, &classIdPoint);
+			if (confidence > confThreshold)
+			{
+				int centerX = (int)(data[0] * frame.cols);
+				int centerY = (int)(data[1] * frame.rows);
+				int width = (int)(data[2] * frame.cols);
+				int height = (int)(data[3] * frame.rows);
+				int left = centerX - width / 2;
+				int top = centerY - height / 2;
+
+				classIds.push_back(classIdPoint.x);
+				confidences.push_back((float)confidence);
+				boxes.push_back(Rect(left, top, width, height));
+			}
+		}
+	}
+
+	vector<int> indices;
+	NMSBoxes(boxes, confidences, confThreshold, nmsThreshold, indices);
+
+
+	// Draw Predict Boxes
+	if (indices.size() > 0)
+	{
+		// string notify_msg = to_string(indices.size()) + " Object Detected.";
+		// ui.notification->setText(QString::fromStdString(notify_msg));
+
+		// Object_Count * 2 value per Coord * 5_Coordinates
+		//int* pRect = new int[indices.size() * 2 * 5];
+		for (size_t i = 0; i < indices.size(); ++i)
+		{
+			int idx = indices[i];
+			Rect box = boxes[idx];
+
+			if (ShowBBox == 1)
+			{
+				rectangle(frame, Point(box.x, box.y), Point(box.x + box.width, box.y + box.height), Scalar(0, 0, 255), 1);
+			}
+
+			string label = format("%.2f", confidences[idx]);
+			if (!classes.empty())
+			{
+				CV_Assert(classIds[idx] < (int)classes.size());
+				label = classes[classIds[idx]] + ":" + label;
+			}
+			int baseLine;
+			Size labelSize = getTextSize(label, FONT_HERSHEY_SIMPLEX, 0.5, 1, &baseLine);
+			box.y = max(box.y, labelSize.height);
+
+			if (ShowObjNames_Conf == 1)
+			{
+				putText(frame, label, Point(box.x, box.y), FONT_HERSHEY_SIMPLEX, 0.75, Scalar(0, 255, 0), 1);
+			}
+
+			std::string i_str = std::to_string(i + 1);
+
+			if (ShowObjectIndex == 1)
+			{
+				putText(frame, i_str, Point(box.x + box.width, box.y), FONT_HERSHEY_SIMPLEX, 0.75, Scalar(0, 0, 255), 1);
+			}
+
+		}
+	}
+
+	return frame;
+}
+
+void Send(SOCKET client, char send_buf[])
+{
+}
+
+void Recv(SOCKET client, char recv_buf[])
+{
+	while (true)
+	{
+		recv(client, recv_buf, 100, 0);
+		// Return Recv_Buff
+	}
+}

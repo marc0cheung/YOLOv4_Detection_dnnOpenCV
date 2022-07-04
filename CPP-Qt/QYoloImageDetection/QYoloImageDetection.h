@@ -29,6 +29,7 @@ public slots:
     void on_showNames_checkbox_Changed(int state);
     void on_objIndex_checkbox_Changed(int state);
     void on_showBBox_checkbox_Changed(int state);
+    void on_openSocketCheckbox_Changed(int state);
     
 private:
     Ui::QYoloImageDetectionClass ui;
