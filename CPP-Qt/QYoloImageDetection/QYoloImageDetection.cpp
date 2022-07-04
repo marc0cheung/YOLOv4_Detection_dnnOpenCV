@@ -656,15 +656,6 @@ Mat Detection(Mat frame)
 				putText(frame, i_str, Point(box.x + box.width, box.y), FONT_HERSHEY_SIMPLEX, 0.75, Scalar(0, 0, 255), 1);
 			}
 
-			// Use String to send coordinates to receiver, but needs decoding process.
-			String sendData;
-			sendData += "Object_" + to_string(i + 1) + "\n[(";                                              // Object Count
-			sendData += to_string(box.x) + "," + to_string(box.y) + ")-(";                                 // Point 1
-			sendData += to_string(box.x + box.width) + "," + to_string(box.y) + ")-(";                    // Point 2
-			sendData += to_string(box.x) + ", " + to_string(box.y + box.height) + ")-(";                 // Point 3
-			sendData += to_string(box.x + box.width) + "," + to_string(box.y + box.height) + ")-(";      // Point 4
-			sendData += to_string(box.x + (box.width / 2)) + "," + to_string(box.y + (box.height / 2)) + ")]";  // Point 5
-
 			// save each target's coordinates to pRect
 			// Point 1
 			pRect[i * 10 + 0] = box.x;
@@ -687,7 +678,10 @@ Mat Detection(Mat frame)
 			// send_len = send(s_server, send_buf, 100, 0);
 
 		}
-		sendCoords(indices.size(), pRect);
+		if (openSocket == 1)
+			sendCoords(indices.size(), pRect);
+		
+		delete[]pRect;
 	}
 	return frame;
 }
@@ -726,15 +720,15 @@ void sendCoords(int nNum, int* pRectPoints)
 
 	for (int i = 0; i < nNum; i++)
 	{
-		string targetMsg = "[(" + to_string(pRectPoints[i * 10 + 0]) + "," + to_string(pRectPoints[i * 10 + 1]) + "),(" +
+		string targetMsg = "[" + to_string(i+1) + ",(" + to_string(pRectPoints[i * 10 + 0]) + "," + to_string(pRectPoints[i * 10 + 1]) + "),(" +
 			to_string(pRectPoints[i * 10 + 2]) + "," + to_string(pRectPoints[i * 10 + 3]) + "),(" +
 			to_string(pRectPoints[i * 10 + 4]) + "," + to_string(pRectPoints[i * 10 + 5]) + "),(" +
 			to_string(pRectPoints[i * 10 + 6]) + "," + to_string(pRectPoints[i * 10 + 7]) + "),(" +
-			to_string(pRectPoints[i * 10 + 8]) + "," + to_string(pRectPoints[i * 10 + 9]) + ")]";
+			to_string(pRectPoints[i * 10 + 8]) + "," + to_string(pRectPoints[i * 10 + 9]) + ")]\n";
 		
 		// Bug Here.
 		strcpy(send_buf, strdup(targetMsg.c_str()));
-		send_len = send(s_server, send_buf, 2048, 0);
+		send_len = send(s_server, send_buf, strlen(send_buf) + 1, 0);
 	}
 
 	
