@@ -78,7 +78,7 @@
     <property name="geometry">
      <rect>
       <x>860</x>
-      <y>100</y>
+      <y>90</y>
       <width>111</width>
       <height>19</height>
      </rect>
@@ -291,7 +291,7 @@ p, li { white-space: pre-wrap; }
     <property name="geometry">
      <rect>
       <x>860</x>
-      <y>40</y>
+      <y>30</y>
       <width>121</width>
       <height>19</height>
      </rect>
@@ -354,7 +354,7 @@ p, li { white-space: pre-wrap; }
     <property name="geometry">
      <rect>
       <x>860</x>
-      <y>70</y>
+      <y>60</y>
       <width>121</width>
       <height>19</height>
      </rect>
@@ -444,6 +444,25 @@ p, li { white-space: pre-wrap; }
     </property>
     <property name="text">
      <string>Marco Cheung @ 2022, https://github.com/marc0cheung/</string>
+    </property>
+   </widget>
+   <widget class="QCheckBox" name="openSocketCheckbox">
+    <property name="enabled">
+     <bool>true</bool>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>860</x>
+      <y>120</y>
+      <width>131</width>
+      <height>19</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Open Socket</string>
+    </property>
+    <property name="checked">
+     <bool>false</bool>
     </property>
    </widget>
   </widget>
