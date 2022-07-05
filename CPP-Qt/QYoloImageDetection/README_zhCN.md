@@ -31,6 +31,12 @@ QYoloImageDetection 是一个支持图像输入的目标检测程序，基于 C+
 
 <br>
 
+## 程序流程图
+
+<div align="center"><img src="https://github.com/marc0cheung/YOLOv4_Detection_dnnOpenCV/raw/main/CPP-Qt/QYoloImageDetection/README.assets/diagram_zhCN.png" alt="diagram_zhCN" width="1200px" /></div>
+
+<br>
+
 ## 如何使用 QYoloImageDetection
 
 - 在应用程序窗口左上角使用 3 个 Select 按钮以选择 Darknet 的网络文件，如 `.cfg` , `.names` 和 `.weights` 文件。
@@ -45,6 +51,24 @@ QYoloImageDetection 是一个支持图像输入的目标检测程序，基于 C+
 <br>
 
 <div align="center"><img src="https://github.com/marc0cheung/YOLOv4_Detection_dnnOpenCV/raw/main/CPP-Qt/QYoloImageDetection/README.assets/ImageDetection.png" alt="Object Detection using QYoloImageDetection" width="600px"></div>
+
+<br>
+
+**使用 Socket 发送目标坐标**
+
+<div align="center"><img src="https://github.com/marc0cheung/YOLOv4_Detection_dnnOpenCV/raw/main/CPP-Qt/QYoloImageDetection/README.assets/socketSendCoordinates.png" alt="socketSendCoordinates" width="700px" /></div>
+
+<br>
+
+坐标信息解读：
+
+[index, (Point1.x, Point1.y), (Point2.x, Point2.y), (Point3.x, Point3.y), (Point4.x, Point4.y), (Point5.x, Point5.y)]
+
+<br>
+
+**目标分割结果展示**
+
+<div align="center"><img src="https://github.com/marc0cheung/YOLOv4_Detection_dnnOpenCV/raw/main/CPP-Qt/QYoloImageDetection/README.assets/segmentResult.png" alt="segmentResult" width="700px" /></div>
 
 <br>
 
