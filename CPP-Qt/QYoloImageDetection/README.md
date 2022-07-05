@@ -21,13 +21,14 @@ An Image Object Detector based on C++ and Qt 5.15.0. Using OpenCV `dnn` module t
 - Result Display Info Configuration
 - Object segment and Save segment result
 - Save Detection Result
+- Send target object coordinates using Socket Communication at 127.0.0.1, Port 1234
 
 <br>
 
 **Features on the drawing board:**
 
-- Socket Communication
-- Pass object coordinates via socket protocol.
+- Receive Mat data from other application via Socket Communication
+- Keep Socket Communication listening at the background using multi-thread method as Socket client
 
 <br>
 
@@ -39,6 +40,7 @@ An Image Object Detector based on C++ and Qt 5.15.0. Using OpenCV `dnn` module t
 - Select Source Image using `Select` button of the `Original Image` part， the original image will pop up in a OpenCV `highgui` window. 
 - Simply Click `Go` , the application will read darknet with OpenCV dnn module and the result image will pop up.
 - Click `Segment_Save` or `Save Cap` button as you wish. Remember to **Select Result Saving Path** beforehand. 
+- Tick "Open Socket" Check box and configure the Address and Port then click "Socket!" if you want to send target object coordinates using Socket Communication.
 
 <br>
 
@@ -48,7 +50,7 @@ An Image Object Detector based on C++ and Qt 5.15.0. Using OpenCV `dnn` module t
 
 ## How to modify from the source code
 
-- This application is based on **OpenCV 4.5.5 x64 CPU version** and **Qt 5.15.0 x64**
+- This application is based on **OpenCV 4.5.5 x64 CPU version** and **Qt 5.15.0 x64**. Due to the import of the `winsock.h` lib, this code probably **only** suitable for the Windows PC. You need to find another way to achieve Socket Communication if you are a macOS or Linux user.
 - You need to deploy both **OpenCV 4.x.x** and **Qt 5.15.x** to ensure the source code can be successfully complied on your PC.
 
 <br>
