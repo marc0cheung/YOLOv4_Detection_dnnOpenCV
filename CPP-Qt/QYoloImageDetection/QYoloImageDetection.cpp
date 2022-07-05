@@ -277,7 +277,7 @@ void QYoloImageDetection::on_save_cap_Selected()
 			ui.notification->setText(QString::fromStdString(notify_msg));
 
 			// Object_Count * 2 value per Coord * 5_Coordinates
-			//int* pRect = new int[indices.size() * 2 * 5];
+			int* pRect = new int[indices.size() * 2 * 5];
 			for (size_t i = 0; i < indices.size(); ++i)
 			{
 				int idx = indices[i];
@@ -310,7 +310,28 @@ void QYoloImageDetection::on_save_cap_Selected()
 					putText(frame, i_str, Point(box.x + box.width, box.y), FONT_HERSHEY_SIMPLEX, 0.75, Scalar(0, 0, 255), 1);
 				}
 
+				// save each target's coordinates to pRect
+				// Point 1
+				pRect[i * 10 + 0] = box.x;
+				pRect[i * 10 + 1] = box.y;
+				// Point 2
+				pRect[i * 10 + 2] = box.x + box.width;
+				pRect[i * 10 + 3] = box.y;
+				// Point 3
+				pRect[i * 10 + 4] = box.x;
+				pRect[i * 10 + 5] = box.y + box.height;
+				// Point 4
+				pRect[i * 10 + 6] = box.x + box.width;
+				pRect[i * 10 + 7] = box.y + box.height;
+				// Center Point
+				pRect[i * 10 + 8] = (int)((box.x + box.width) / 2);
+				pRect[i * 10 + 9] = (int)((box.y + box.height) / 2);
+
 			}
+			if (openSocket == 1)
+				sendCoords(indices.size(), pRect);
+
+			delete[]pRect;
 		}
 		// imshow and imwrite
 		imshow("Detection Result", frame);
@@ -411,7 +432,7 @@ void QYoloImageDetection::on_segment_save_Selected()
 			ui.notification->setText(QString::fromStdString(notify_msg));
 
 			// Object_Count * 2 value per Coord * 5_Coordinates
-			//int* pRect = new int[indices.size() * 2 * 5];
+			int* pRect = new int[indices.size() * 2 * 5];
 			for (size_t i = 0; i < indices.size(); ++i)
 			{
 				int idx = indices[i];
@@ -460,7 +481,28 @@ void QYoloImageDetection::on_segment_save_Selected()
 					ui.notification->setText("Segment Saved!");
 				}
 
+				// save each target's coordinates to pRect
+				// Point 1
+				pRect[i * 10 + 0] = box.x;
+				pRect[i * 10 + 1] = box.y;
+				// Point 2
+				pRect[i * 10 + 2] = box.x + box.width;
+				pRect[i * 10 + 3] = box.y;
+				// Point 3
+				pRect[i * 10 + 4] = box.x;
+				pRect[i * 10 + 5] = box.y + box.height;
+				// Point 4
+				pRect[i * 10 + 6] = box.x + box.width;
+				pRect[i * 10 + 7] = box.y + box.height;
+				// Center Point
+				pRect[i * 10 + 8] = (int)((box.x + box.width) / 2);
+				pRect[i * 10 + 9] = (int)((box.y + box.height) / 2);
+
 			}
+			if (openSocket == 1)
+				sendCoords(indices.size(), pRect);
+
+			delete[]pRect;
 		}
 
 		imshow("Detected Result", frame);
