@@ -43,6 +43,7 @@ int ShowObjectIndex = 0;
 int openSocket = 0;
 float confThreshold = 0.7;
 float nmsThreshold = 0.4;
+int test = 0;
 
 String cfgFile = "./network/button_v2.cfg";
 String weightsFile = "./network/button_v2.weights";
@@ -76,6 +77,8 @@ QYoloImageDetection::QYoloImageDetection(QWidget *parent)
 	connect(ui.cfgFileBtn, SIGNAL(clicked()), this, SLOT(on_cfgFileBtn_Selected()));
 	connect(ui.namesFileBtn, SIGNAL(clicked()), this, SLOT(on_namesFileBtn_Selected()));
 	connect(ui.weightsFileBtn, SIGNAL(clicked()), this, SLOT(on_weightsFileBtn_Selected()));
+
+	connect(ui.loopBtn, SIGNAL(clicked()), this, SLOT(on_loopBtn_Selected()));
 
 }
 
@@ -591,6 +594,70 @@ void QYoloImageDetection::Socket_SendCoord(string sendData)
 	WSACleanup();
 }
 
+void QYoloImageDetection::on_loopBtn_Selected()
+{
+	// Initialize Socket Connection
+	int recv_len = 0;
+	char recv_buf[2048];
+
+	SOCKET s_server;
+	SOCKADDR_IN server_addr;
+
+	WORD wVersion = MAKEWORD(2, 2);
+	WSADATA wsadata;
+	if (WSAStartup(wVersion, &wsadata) != 0)
+	{
+		cout << "WSA StartUp Error" << endl;
+	}
+
+	SOCKET s = socket(AF_INET, SOCK_STREAM, 0);
+	if (s == INVALID_SOCKET)
+	{
+		cout << "Invalid Socket." << endl;
+	}
+
+	server_addr.sin_family = AF_INET;
+	server_addr.sin_addr.S_un.S_addr = inet_addr("127.0.0.1");
+	server_addr.sin_port = htons(1234);
+
+	s_server = socket(AF_INET, SOCK_STREAM, 0);
+
+	if (::connect(s_server, (SOCKADDR*)&server_addr, sizeof(SOCKADDR)) == SOCKET_ERROR) {
+		cout << "Connect Error" << endl;
+		WSACleanup();
+	}
+	
+	while (true)
+	{
+		memset(recv_buf, '\0', sizeof(recv_buf));
+		//test = test + 1;
+		recv(s_server, recv_buf, sizeof(recv_buf) + 1, 0);  // BUG Here: Blocked if did not receive path_message
+		string recv_string = recv_buf;
+		string headerMessage = recv_string.substr(0, 5);    // Should be "path:"
+		string pathFromSocket = recv_string.substr(5, recv_string.length());  // Get rid of the socket message header "path:"
+
+		if (headerMessage == "path:")
+		{
+			// if receive source image path -> detection start -> send coordinates via socket
+			if ((cfgFile == "./network/button_v2.cfg") & (weightsFile == "./network/button_v2.weights") & (namesFile == "./network/button_v2.names"))
+			{
+				QMessageBox::information(NULL, "Haven't Set Darknet File", "Use Default Network Configuration: Button_v2", QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
+			}
+
+			Mat frame = imread(pathFromSocket);
+
+			frame = Detection(frame);
+
+			// SHOW DETECTION RESULT
+			imshow("Detection Result", frame);
+
+			ui.notification->setText(QString::fromStdString(pathFromSocket));
+		}
+
+		QApplication::processEvents(QEventLoop::AllEvents, 500);  // Keep Qt Window Alive
+	}
+}
+
 QYoloImageDetection::~QYoloImageDetection()
 {}
 
@@ -768,7 +835,6 @@ void sendCoords(int nNum, int* pRectPoints)
 			to_string(pRectPoints[i * 10 + 6]) + "," + to_string(pRectPoints[i * 10 + 7]) + "),(" +
 			to_string(pRectPoints[i * 10 + 8]) + "," + to_string(pRectPoints[i * 10 + 9]) + ")]\n";
 		
-		// Bug Here.
 		strcpy(send_buf, strdup(targetMsg.c_str()));
 		send_len = send(s_server, send_buf, strlen(send_buf) + 1, 0);
 	}

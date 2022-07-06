@@ -26,6 +26,8 @@ public slots:
     void on_namesFileBtn_Selected();
     void on_weightsFileBtn_Selected();
 
+    void on_loopBtn_Selected();
+
     // For CheckBox
     void on_showNames_checkbox_Changed(int state);
     void on_objIndex_checkbox_Changed(int state);
